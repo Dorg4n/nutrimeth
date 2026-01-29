@@ -1,0 +1,2684 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trilha do Paciente</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Yeseva+One&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Creato+Display&display=swap" rel="stylesheet">
+
+<style>
+/* ================= RESET & BASE ================= */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* ================= FONTES CUSTOMIZADAS ================= */
+@font-face {
+  font-family: 'Swirly Canalope';
+  src: url('./SwirlyCanalope_PERSONAL_USE_ONLY.otf') format('opentype');
+}
+
+body {
+  font-family: 'Segoe UI', Georgia, serif;
+  background: #FAF8F1;
+  color: #000;
+  overflow-x: hidden;
+}
+
+/* ================= FAIXA SUPERIOR ================= */
+.top-bar { 
+  background: #34656D; 
+  color: #fff; 
+  overflow: hidden; 
+  white-space: nowrap; 
+  position: relative; 
+  z-index: 10001; 
+}
+
+.top-bar-track { 
+  display: flex; 
+  width: max-content; 
+  animation: marquee 30s linear infinite; 
+}
+
+.top-bar span { 
+  padding: 12px 40px; 
+  font-size: 14px; 
+  flex-shrink: 0;
+}
+
+@keyframes marquee { 
+  from { transform: translateX(0); } 
+  to { transform: translateX(-50%); } 
+}
+
+/* ================= MENU DINÂMICO ================= */
+.menu-wrapper { 
+  position: sticky; 
+  top: 60px; 
+  z-index: 9999; 
+  padding: 0; 
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); 
+  width: 100%;
+}
+
+.menu-wrapper.scrolled { 
+  top: 10px; 
+}
+
+.menu {
+  max-width: 1200px;
+  margin: 0 auto;
+  background: transparent;
+  border-radius: 40px;
+  padding: 12px 32px;
+  display: flex;
+  justify-content: space-between; 
+  align-items: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  border: 1px solid rgba(0,0,0,0.05);
+}
+
+.menu-wrapper.scrolled .menu { 
+  background: rgba(250, 248, 241, 0.95);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  transform: scale(0.96); 
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+}
+
+.logo-container img {
+  max-height: 60px;
+  width: auto;
+  display: block;
+  transition: max-height 0.3s ease;
+}
+
+.menu-center { 
+    display: flex; 
+    justify-content: center; 
+    gap: 28px; 
+    flex: 1; 
+}
+
+.menu-center a { 
+  position: relative; 
+  text-decoration: none; 
+  color: #334443; 
+  font-size: 15px; 
+  font-weight: 700; 
+  padding-bottom: 4px; 
+}
+
+.menu-center a::after { content: ""; position: absolute; left: 0; bottom: 0; width: 0; height: 2px; background: #4CAF50; transition: width 0.3s ease; }
+.menu-center a:hover::after { width: 100%; }
+
+.menu-right { 
+    display: flex; 
+    align-items: center; 
+    gap: 12px; 
+    justify-content: flex-end;
+}
+
+.btn { background: #34656D; color: #fff; border: none; padding: 16px 40px; border-radius: 35px; cursor: pointer; font-size: 18px; font-weight: 600; transition: transform 0.2s; white-space: nowrap; }
+.btn:hover { transform: scale(1.05); }
+.btn-outline { background: transparent; border: 2px solid #34656D; color: #34656D; padding: 10px 18px; border-radius: 20px; cursor: pointer; font-size: 14px; font-weight: 700;}
+
+.menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #34656D;
+  cursor: pointer;
+  margin-left: 5px;
+}
+
+/* ================= MOBILE NAV OVERLAY ================= */
+.mobile-nav {
+  position: fixed;
+  top: 0;
+  right: -100%;
+  width: 80%;
+  max-width: 300px;
+  height: 100%;
+  background: #FAF8F1;
+  z-index: 10002;
+  transition: 0.4s ease;
+  padding: 40px 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+}
+
+.mobile-nav.active { right: 0; }
+
+.mobile-nav .close-menu {
+  align-self: flex-end;
+  font-size: 24px;
+  color: #34656D;
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+
+.mobile-nav a {
+  text-decoration: none;
+  color: #334443;
+  font-size: 18px;
+  font-weight: 700;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  padding-bottom: 10px;
+}
+
+.mobile-nav .btn-mobile-login {
+  margin-top: 10px;
+  text-align: center;
+}
+
+.overlay-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  z-index: 10001;
+  display: none;
+}
+
+.overlay-bg.active { display: block; }
+
+/* ================= HERO CONTAINER ================= */
+.hero-container {
+  position: relative;
+  width: 100%;
+  min-height: 95vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-top: -125px; 
+}
+
+.background-hero {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url('./img2-3.png');
+  background-size: cover;
+  background-position: center;
+  z-index: -1;
+}
+
+.hero { 
+  display: flex; 
+  flex-direction: column; 
+  align-items: flex-start; 
+  max-width: 1200px; 
+  margin: 0 auto;
+  padding: 240px 32px 60px 32px; 
+  text-align: left; 
+  width: 100%;
+}
+
+.hero h1 {
+  color: #fff; 
+  font-size: 64px; 
+  line-height: 1.1; 
+  margin-bottom: 20px; 
+  max-width: 500px; 
+  text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+}
+
+.hero .btn-hero {
+  margin-left: 200px;
+  font-size: 18px;
+  margin-top: 250px;
+  padding: 16px 40px;
+  background: #af7c42; 
+  color: #ffffff; 
+  border-radius: 35px; 
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.hero .btn-hero:hover {
+  background: #ffffff;
+  box-shadow: #ffc076 0px 6px 15px;
+  color: #af7c42;
+}
+
+/* ================= CTA BANNERS ================= */
+.banners-cta-section {
+  padding: 100px 32px 40px 32px;
+  background: transparent;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.banners-cta-section h2 {
+  font-family: 'Yeseva One', serif;
+  font-size: 48px;
+  line-height: 1.1;
+  font-weight: 400;
+  text-align: center;
+  margin-top: -35px;
+  margin-bottom: 40px;
+  max-width: 850px;
+  color: #34656D;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.banners-cta-section h2 span {
+  color: #34656D;
+}
+
+.btn-cta-orange {
+  background: #af7c42;
+  color: #fff;
+  border: none;
+  padding: 16px 40px;
+  border-radius: 35px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.3s;
+  margin-bottom: 60px;
+}
+
+.btn-cta-orange:hover {
+  background: #855c2d;
+  transform: translateY(-2px);
+}
+
+/* ================= BANNERS EXPANSÍVEIS ================= */
+.banner-grid-container {
+  display: flex;
+  gap: 20px;
+  width: 100%;
+  height: 550px;
+}
+
+.banner-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  transition: flex 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+  cursor: pointer;
+  min-width: 0;
+  opacity: 0;
+  transform: translateX(-50px) translateY(-30px);
+}
+
+.banner-item.animate {
+  animation: slideInBanner 0.8s ease-out forwards;
+}
+
+@keyframes slideInBanner {
+  from {
+    opacity: 0;
+    transform: translateX(-50px) translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) translateY(0);
+  }
+}
+
+.banner-item.animate:nth-child(1) {
+  animation-delay: 0.2s;
+}
+
+.banner-item.animate:nth-child(2) {
+  animation-delay: 0.4s;
+}
+
+.banner-item.animate:nth-child(3) {
+  animation-delay: 0.6s;
+}
+
+.banner-item.animate:nth-child(4) {
+  animation-delay: 0.8s;
+}
+
+.banner-item:hover {
+  flex: 2.5;
+}
+
+.banner-img-container {
+  width: 100%;
+  height: 400px; 
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
+}
+
+.banner-img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  transition: transform 0.6s ease;
+}
+
+.banner-item:hover .banner-img {
+  transform: scale(1.05);
+}
+
+.banner-content-outside {
+  padding: 15px 5px;
+  color: #333;
+}
+
+.banner-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: #34656D;
+}
+
+/* Descrição escondida por padrão no Desktop */
+.banner-description {
+  font-size: 14px;
+  line-height: 1.4;
+  color: #666;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.banner-item:hover .banner-description {
+  opacity: 1;
+}
+
+/* Navegação Mobile */
+.banner-nav-mobile {
+  display: none;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 15px;
+}
+
+.nav-arrow {
+  cursor: pointer;
+  color: #34656D;
+  font-size: 24px;
+}
+
+/* ================= SEÇÃO DO APP ================= */
+.app-section {
+  padding: 0px 32px 60px 32px;
+  background: transparent;
+  max-width: 1200px;
+  margin: -100px auto 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 60px;
+}
+
+.app-content {
+  flex: 1;
+  max-width: 500px;
+}
+
+.app-content h2 {
+  font-family: 'Yeseva One', serif;
+  font-size: 48px;
+  line-height: 1.2;
+  color: #515151;
+  margin-bottom: 25px;
+  display: flex;
+  flex-direction: column;
+}
+
+.method-title {
+  font-family: 'Circular Std', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-weight: 500;
+  white-space: nowrap;
+  color: #515151;
+  display: inline-block;
+  width: 0;
+  overflow: hidden;
+  border-right: 3px solid #515151;
+  animation: none;
+}
+
+.method-title.animate {
+  animation: typing 2s steps(20, end) forwards, blink-caret 0.75s step-end 2 forwards;
+  animation-delay: 0s, 2s;
+}
+
+.method-highlight {
+  background: #FAEAB1;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.method-subtitle {
+  font-family: 'Swirly Canalope', cursive;
+  font-size: 85px;
+  margin-top: -20px;
+  white-space: nowrap;
+  color: #34656D;
+}
+
+.app-content p {
+  font-size: 20px;
+  line-height: 1.8;
+  color: #555;
+  margin-bottom: 35px;
+}
+
+.btn-app {
+  background: #34656d;
+  color: #fff;
+  border: none;
+  padding: 16px 40px;
+  border-radius: 35px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.btn-app:hover {
+  background: #333;
+  transform: translateY(-2px);
+}
+
+.app-phone-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.phone-mockup {
+  width: 275px;
+  height: 500px;
+  background: #000;
+  border-radius: 40px;
+  padding: 12px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  position: relative;
+  margin-top: 80px;
+}
+
+.phone-notch {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 150px;
+  height: 30px;
+  background: #000;
+  border-radius: 0 0 20px 20px;
+  z-index: 2;
+}
+
+.phone-screen {
+  width: 100%;
+  height: 100%;
+  background: #fff;
+  border-radius: 30px;
+  overflow: hidden;
+  position: relative;
+}
+
+.phone-screen img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.phone-info {
+  text-align: center;
+  padding: 25px;
+  border-radius: 20px;
+  max-width: 300px;
+  position: relative;
+  overflow: hidden;
+}
+
+.phone-info h3 {
+  font-size: 20px;
+  font-weight: bold;
+  color: #34656D;
+  margin-bottom: 10px;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.phone-info p {
+  font-size: 16px;
+  color: #555;
+  line-height: 1.5;
+  margin-bottom: 20px;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.phone-info h3.fade-out,
+.phone-info p.fade-out {
+  opacity: 0;
+  transform: translateX(-30px);
+}
+
+.phone-info h3.fade-in,
+.phone-info p.fade-in {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.phone-info h3.slide-right,
+.phone-info p.slide-right {
+  transform: translateX(30px);
+  opacity: 0;
+}
+
+.phone-nav-arrows {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+}
+
+.phone-nav-arrows .nav-arrow {
+  cursor: pointer;
+  color: #34656D;
+  font-size: 24px;
+  transition: transform 0.2s;
+}
+
+.phone-nav-arrows .nav-arrow:hover {
+  transform: scale(1.1);
+}
+
+/* ================= SEÇÃO DE PLANOS ================= */
+.pricing-section {
+  padding: 80px 20px; 
+  background: transparent;
+  text-align: center;
+  margin-top: -60px;
+}
+
+.pricing-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 20px;
+  max-width: 1150px;
+  margin: 0 auto;
+  flex-wrap: wrap;
+}
+
+.pricing-card {
+  background: #34656D;
+  border-radius: 30px;
+  width: 320px;
+  padding: 40px 25px;
+  position: relative;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  overflow: hidden;
+  opacity: 0;
+  transform: translateY(-80px);
+}
+
+.pricing-card.slide-down {
+  animation: cardSlideDown 1s ease-out forwards;
+}
+
+.pricing-card:nth-child(1).slide-down {
+  animation-delay: 0s;
+}
+
+.pricing-card:nth-child(2).slide-down {
+  animation-delay: 0.5s;
+}
+
+.pricing-card:nth-child(3).slide-down {
+  animation-delay: 1s;
+}
+
+@keyframes cardSlideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-80px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.pricing-card.side-card { transform: translateY(0); width: 350px; }
+.pricing-card.featured { background: #34656D; width: 350px; padding: 40px 25px 25px 25px; z-index: 2; transform: translateY(0); border-radius: 0 0 30px 30px; overflow: visible; margin-top: 20px; }
+
+.pricing-card.featured > :first-child {
+  margin-top: -25px;
+}
+.pricing-card:hover { scale: 1.05; box-shadow: 0 20px 40px rgba(0,0,0,0.2), 0 0 60px rgba(255,255,255,0.5); z-index: 10; }
+
+.featured-tag {
+  background: #fff;
+  color: #334443;
+  padding: 12px 30px;
+  font-weight: bold;
+  font-size: 12px;
+  text-transform: uppercase;
+  text-align: center;
+  border-radius: 15px 15px 0 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  margin: 0;
+}
+
+.plan-name { font-family: 'Yeseva One', serif; font-size: 28px; margin-bottom: 25px; color: #FAEAB1; }
+.pricing-card hr { border: 0; border-top: 1px solid rgba(255,255,255,0.5); margin-bottom: 25px; }
+
+.features-list { list-style: none; text-align: left; margin-bottom: 30px; flex-grow: 1; }
+.features-list li { margin-bottom: 12px; font-size: 15px; color: #FAF8F1; display: flex; align-items: center; gap: 10px; }
+.features-list li i { color: #34656D; font-size: 12px; background: #FAEAB1; padding: 4px; border-radius: 50%; }
+
+.price-box { margin-bottom: 25px; color: #FAEAB1; }
+.price-main { font-family: 'Yeseva One', serif; font-size: 42px; color: #FAF8F1; }
+.price-sub { display: block; font-size: 16px; font-weight: bold; color: #FAF8F1; }
+
+.btn-plan { background: #fff; color: #334443; border: none; padding: 16px 40px; border-radius: 35px; font-size: 18px; font-weight: bold; text-decoration: none; transition: background 0.3s; text-align: center; }
+.btn-plan:hover { background: #FAEAB1; color: #334443; }
+
+/* ================= LOGIN & DASHBOARD (PRESERVADO) ================= */
+#login-screen { display: grid; height: 100vh; width: 100%; background: transparent; grid-template-columns: 1fr 1fr; }
+#dashboard { display: none; height: 100vh; width: 100vw; background: transparent; display: flex; flex-direction: column; }
+.sidebar { display: none; position: fixed; bottom: 0; left: 0; right: 0; }
+.login-left { display: none; flex-direction: column; padding: 60px 10%; justify-content: center; }
+.login-logo { position: absolute; top: 40px; left: 60px; }
+.login-logo img { height: 70px; }
+.login-form-container { max-width: 400px; }
+.login-form-container h2 { font-family: 'Georgia', serif; font-size: 32px; color: #334443; margin-bottom: 8px; }
+.login-form-container p { color: #666; margin-bottom: 40px; font-size: 16px; }
+.input-group { margin-bottom: 20px; }
+.input-group label { display: block; font-weight: 600; margin-bottom: 10px; color: #333; }
+.input-group input { width: 100%; padding: 15px; border: 1px solid #ccc; border-radius: 25px; font-size: 14px; color: #777; outline: none; }
+#password-group { display: none; opacity: 0; transform: translateY(-10px); transition: all 0.4s ease; }
+#password-group.show { display: block; opacity: 1; transform: translateY(0); }
+#login-error-msg { color: #e74c3c; font-size: 14px; margin-bottom: 15px; display: none; }
+.btn-login-submit { width: 100%; background: #34656D; color: #fff; border: none; padding: 15px; border-radius: 25px; font-size: 18px; font-family: 'Georgia', serif; cursor: pointer; margin-bottom: 30px; }
+.login-divider { display: flex; align-items: center; text-align: center; margin-bottom: 30px; }
+.login-divider::before, .login-divider::after { content: ''; flex: 1; border-bottom: 1px solid #ccc; }
+.login-divider span { padding: 0 10px; color: #666; font-weight: bold; }
+.social-buttons { display: flex; flex-direction: column; gap: 15px; }
+.btn-social { display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%; padding: 12px; border-radius: 25px; border: 1px solid #ccc; background: #fff; cursor: pointer; font-size: 14px; font-weight: 600; color: #333; }
+.fa-apple { color: #000; }
+.fa-google { color: #DB4437; }
+.login-right { background-color: #333132; background-size: cover; background-position: center; display: flex; align-items: center; justify-content: center; }
+
+#dashboard { display: none; height: 100vh; width: 100vw; background: transparent; display: flex; flex-direction: column; }
+.sidebar { position: fixed; bottom: 0; left: 0; right: 0; height: auto; width: 100%; background: #334443; color: #fff; display: flex; flex-direction: row; justify-content: center; align-items: center; padding: 15px 20px; transition: all 0.3s ease; overflow: visible; flex-shrink: 0; gap: 40px; z-index: 1000; }
+.sidebar.expanded { width: 100%; }
+.sidebar-top { display: none; }
+.sidebar.expanded .sidebar-top { display: none; }
+.logo-sidebar { display: none; max-width: 120px; }
+.sidebar.expanded .logo-sidebar { display: none; }
+.toggle-btn { display: none; cursor: pointer; font-size: 20px; transition: transform 0.3s; }
+.sidebar.expanded .toggle-btn { display: none; transform: rotate(180deg); }
+.nav-items { display: flex; flex-direction: row; gap: 40px; flex-grow: 0; margin-top: 0; justify-content: center; align-items: center; }
+.nav-item { display: flex; flex-direction: column; align-items: center; gap: 8px; text-decoration: none; color: rgba(255,255,255,0.7); padding: 10px; border-radius: 8px; white-space: nowrap; transition: 0.2s; }
+.nav-item i { width: 20px; text-align: center; font-size: 22px; }
+.nav-item span { display: none; font-size: 12px; }
+.sidebar.expanded .nav-item span { display: none; }
+.nav-item.active, .nav-item:hover { color: #fff; background: rgba(255,255,255,0.1); }
+.sidebar-footer { display: flex; flex-direction: row; gap: 40px; padding-top: 0; border-top: none; justify-content: center; align-items: center; }
+.user-profile { display: none; align-items: center; gap: 10px; padding: 5px; }
+.user-avatar { display: none; width: 30px; height: 30px; background: #fff; color: #000; border-radius: 50%; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+.user-info { display: none; }
+.sidebar.expanded .user-info { display: none; }
+.user-name { display: none; font-size: 13px; font-weight: bold; }
+.main-dashboard { flex-grow: 1; overflow-y: auto; background: transparent; display: flex; flex-direction: column; margin-bottom: 80px; }
+.top-hero-dash { 
+  width: 100%; 
+  min-height: 60vh; 
+  background: transparent;
+  display: flex; 
+  align-items: center; 
+  justify-content: space-between;
+  padding: 60px 80px;
+  position: relative;
+  overflow: hidden;
+}
+.hero-dash-content {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+  margin-left: 350px;
+  max-width: 800px;
+  z-index: 2;
+}
+.hero-dash-badge {
+  background: #faeab1;
+  color: #334443;
+  font-size: 16px;
+  font-weight: 800;
+  padding: 10px 24px;
+  display: inline-block;
+  align-self: flex-start;
+  letter-spacing: 1.5px;
+  overflow: hidden;
+  white-space: nowrap;
+  border-right: 3px solid #334443;
+  width: 0;
+  animation: typing 2s steps(30, end) forwards, blink-caret 0.75s step-end infinite;
+  animation-delay: 0s, 0s;
+}
+
+@keyframes typing {
+  from { width: 0; }
+  to { width: 100%; max-width: fit-content; }
+}
+
+@keyframes blink-caret {
+  from, to { border-color: transparent; }
+  50% { border-color: #334443; }
+}
+
+.hero-dash-badge.typed {
+  border-right: none;
+  animation: none;
+  width: auto;
+}
+
+.hero-dash-title {
+  font-family: 'Creato Display', serif;
+  font-size: 58px;
+  font-weight: 500;
+  color: #515151;
+  line-height: 1.3;
+  opacity: 0;
+  animation: slideInFromLeft 1s ease-out 0.3s forwards;
+}
+
+@keyframes slideInFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.hero-dash-subtitle {
+  font-family: 'Swirly Canalope';
+  font-size: 120px;
+  color: #34656D;
+  font-style: normal;
+  margin-top: -75px;
+  letter-spacing: 2px;
+  opacity: 0;
+  animation: slideInFromTop 1s ease-out 0.8s forwards;
+}
+
+@keyframes slideInFromTop {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.hero-dash-text {
+  font-size: 20px;
+  color: #555;
+  line-height: 1.8;
+  margin-top: -15px;
+  max-width: 550px;
+  opacity: 0;
+  animation: slideInTextLeft 1s ease-out 1.3s forwards;
+}
+
+@keyframes slideInTextLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+.hero-dash-button {
+  align-self: flex-start;
+  background: #F4D89F;
+  color: #334443;
+  border: none;
+  padding: 16px 40px;
+  border-radius: 35px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.3s;
+  margin-top: 10px;
+  opacity: 0;
+  animation: fadeInButton 1s ease-out 1.8s forwards;
+}
+
+@keyframes fadeInButton {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hero-dash-button:hover {
+  background: #F0CC7F;
+  transform: translateY(-2px);
+}
+.hero-dash-image-area {
+  flex: 1;
+  position: relative;
+  height: 650px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.hero-dash-image {
+  width: 100%;
+  height: 100%;
+  margin-left: -450px;
+  object-fit: contain;
+  object-position: center;
+  z-index: 2;
+  animation: focusIn 1.5s ease-out forwards;
+}
+
+@keyframes focusIn {
+  from {
+    filter: blur(10px);
+    transform: scale(1.296);
+  }
+  to {
+    filter: blur(0);
+    transform: scale(1.44);
+  }
+}
+
+.hero-dash-stars-bg {
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  right: -80px;
+  top: 35%;
+  transform: translateY(-50%);
+  z-index: 1;
+  opacity: 0.8;
+  animation: shrinkStars 1.5s ease-out forwards;
+}
+
+@keyframes shrinkStars {
+  from {
+    transform: translateY(-50%) scale(1.1);
+  }
+  to {
+    transform: translateY(-50%) scale(1);
+  }
+}
+.content-dash { padding: 40px; }
+.section-title { font-size: 24px; margin-bottom: 25px; color: #000; font-weight: bold; }
+.card-slider { display: flex; gap: 20px; position: relative; align-items: center; }
+.dash-card { min-width: 220px; height: 300px; background: #333132; border-radius: 15px; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 14px; cursor: pointer; transition: 0.3s; }
+.dash-card:hover { transform: translateY(-5px); background: #444; }
+.slider-arrow { width: 35px; height: 35px; background: rgba(255,255,255,0.8); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.2); position: absolute; right: -17px; z-index: 5; }
+.slider-arrow.left { left: -17px; display: none;} 
+
+/* ================= TELA DE VÍDEO (PLAYER) ================= */
+#video-player-screen {
+  display: none;
+  background: transparent;
+  width: 100%;
+  min-height: 100vh;
+  padding-bottom: 50px;
+}
+
+.video-container-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.back-to-dash {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #34656D;
+  text-decoration: none;
+  font-weight: bold;
+  margin-bottom: 20px;
+  cursor: pointer;
+}
+
+.main-video-area {
+  width: 100%;
+  aspect-ratio: 16/9;
+  background: #000;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
+
+.video-info-header {
+  margin-top: 25px;
+}
+
+.video-info-header h1 {
+  font-size: 32px;
+  color: #334443;
+  margin-bottom: 30px;
+}
+
+/* Tabs do Conteúdo */
+.video-tabs {
+  display: flex;
+  gap: 30px;
+  border-bottom: 1px solid #ccc;
+  margin-bottom: 30px;
+}
+
+.tab-btn {
+  padding: 10px 5px;
+  font-weight: 700;
+  color: #666;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+}
+
+.tab-btn.active {
+  color: #34656D;
+  border-bottom-color: #34656D;
+}
+
+.tab-content { display: none; animation: fadeIn 0.3s; }
+.tab-content.active { display: block; }
+
+@keyframes fadeIn { from {opacity: 0;} to {opacity: 1;} }
+
+/* Grid de Aulas */
+.lessons-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.lesson-thumb {
+  background: transparent;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+}
+
+.lesson-img { height: 140px; background: #333132; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 12px; }
+.lesson-meta { padding: 15px; }
+.lesson-meta h4 { font-size: 14px; color: #333; margin-bottom: 5px; }
+
+/* Comentários */
+.comments-section {
+  background: transparent;
+  padding: 25px;
+  border-radius: 15px;
+}
+
+.comment-input-area {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.comment-input-area input {
+  flex: 1;
+  padding: 15px;
+  border-radius: 25px;
+  border: 1px solid #ddd;
+  outline: none;
+}
+
+.comment-item {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.comment-avatar { width: 40px; height: 40px; background: #34656D; color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+.comment-text h5 { font-size: 14px; margin-bottom: 5px; }
+.comment-text p { font-size: 14px; color: #555; }
+
+/* Materiais de Apoio */
+.material-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 15px;
+  background: transparent;
+  border-radius: 10px;
+  text-decoration: none;
+  color: #333;
+  font-weight: 600;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+}
+.material-link i { color: #34656D; font-size: 20px; }
+
+/* ================= SEÇÃO DE DEPOIMENTOS ================= */
+.testimonials-section {
+  position: relative;
+  background: #f2ebd6;
+  padding: 30px 32px 100px 32px;
+  margin-top: 100px;
+  z-index: 1;
+}
+
+.testimonials-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100px;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 100" preserveAspectRatio="none"><path d="M0,50 Q300,0 600,50 T1200,50 L1200,100 L0,100 Z" fill="%23f2ebd6"/></svg>');
+  background-size: cover;
+  background-position: top;
+  transform: translateY(-99%);
+}
+
+.testimonials-section::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100px;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 100" preserveAspectRatio="none"><path d="M0,0 L1200,0 L1200,50 Q900,100 600,50 T0,50 Z" fill="%23f2ebd6"/></svg>');
+  background-size: cover;
+  background-position: bottom;
+  transform: translateY(99%);
+  z-index: 1;
+}
+
+.testimonials-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.testimonials-title-wrapper {
+  margin-bottom: 60px;
+  position: relative;
+}
+
+.testimonials-title {
+  font-family: 'Circular Std', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-weight: 500;
+  font-size: 48px;
+  color: #515151;
+  line-height: 1.2;
+  margin-bottom: 10px;
+  opacity: 0;
+  transform: translateX(-50px);
+  transition: none;
+}
+
+.testimonials-title.slide-in {
+  animation: slideInFromLeft 1s ease-out forwards;
+}
+
+.testimonials-highlight {
+  background: #34656D;
+  color: #FAEAB1;
+  padding: 2px 8px;
+  border-radius: px;
+}
+
+.testimonials-subtitle {
+  font-family: 'Swirly Canalope', cursive;
+  font-size: 120px;
+  font-weight: 320;
+  color: #34656D;
+  line-height: 1;
+  margin-top: -30px;
+  opacity: 0;
+  transform: translateY(-80px);
+  z-index: -1;
+  position: relative;
+  transition: none;
+}
+
+.testimonials-subtitle.slide-down {
+  animation: slideDownFromBehind 1s ease-out 0.3s forwards;
+}
+
+@keyframes slideDownFromBehind {
+  from {
+    opacity: 0;
+    transform: translateY(-80px);
+    z-index: -1;
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    z-index: 1;
+  }
+}
+
+/* Grid de avaliações */
+.reviews-grid {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 30px;
+  max-width: 1200px;
+  margin: 0 auto;
+  align-items: start;
+  position: relative;
+}
+
+.reviews-grid.has-more-content::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 350px;
+  height: 100%;
+  background: linear-gradient(to right, transparent 0%, #f2ebd6 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Caixa de rating do Google */
+.google-rating-box {
+  background: #fff;
+  border-radius: 20px;
+  padding: 40px 30px;
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+}
+
+.rating-label {
+  font-family: 'Georgia', serif;
+  font-size: 28px;
+  font-weight: bold;
+  color: #34656D;
+  margin-bottom: 15px;
+  letter-spacing: 2px;
+}
+
+.rating-stars {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+  margin-bottom: 20px;
+}
+
+.rating-stars i {
+  color: #FBBF24;
+  font-size: 28px;
+}
+
+.rating-info {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 20px;
+}
+
+.google-logo {
+  width: 80px;
+  margin-top: 10px;
+}
+
+/* Cards de depoimentos */
+.reviews-cards {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  gap: 20px;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+.reviews-cards::-webkit-scrollbar {
+  display: none;
+}
+
+.review-card {
+  background: #fff;
+  border-radius: 15px;
+  padding: 25px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  min-width: 320px;
+  flex: 0 0 320px;
+  scroll-snap-align: start;
+}
+
+.review-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.review-avatar {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  background: #34656D;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+.review-user-info {
+  flex: 1;
+}
+
+.review-name {
+  font-size: 15px;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 2px;
+}
+
+.review-date {
+  font-size: 12px;
+  color: #999;
+}
+
+.review-google-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.review-stars {
+  display: flex;
+  gap: 3px;
+}
+
+.review-stars i {
+  color: #FBBF24;
+  font-size: 14px;
+}
+
+.review-text {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #555;
+}
+
+/* ================= SEÇÃO SOBRE A NUTRICIONISTA ================= */
+.about-section {
+  position: relative;
+  background: #faf8f1;
+  padding: 120px 32px 80px 32px;
+  margin-top: 0;
+  overflow: visible;
+}
+
+.about-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100px;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 100" preserveAspectRatio="none"><path d="M0,50 Q300,0 600,50 T1200,50 L1200,100 L0,100 Z" fill="%23ffffff"/></svg>');
+  background-size: cover;
+  background-position: top;
+  transform: translateY(-99%);
+}
+
+.about-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 400px 1fr;
+  gap: 80px;
+  align-items: start;
+  position: relative;
+}
+
+.about-image-wrapper {
+  position: relative;
+  z-index: 50;
+}
+
+.about-image {
+  width: 200%;
+  height: auto;
+  object-fit: cover;
+  border-radius: 20px;
+  margin-top: -150px;
+  margin-left: -250px;
+  position: relative;
+  z-index: 50;
+  filter: blur(10px);
+  transform: scale(0.9);
+  opacity: 0.3;
+  transition: none;
+}
+
+.about-image.reveal {
+  animation: revealImage 1.5s ease-out forwards;
+}
+
+@keyframes revealImage {
+  0% {
+    filter: blur(10px);
+    transform: scale(0.9);
+    opacity: 0.3;
+  }
+  100% {
+    filter: blur(0);
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.about-content {
+  padding-top: 20px;
+}
+
+.about-title {
+  font-family: 'Circular Std', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-weight: 500;
+  font-size: 42px;
+  color: #515151;
+  display: block;
+  margin-bottom: 10px;
+  line-height: 1;
+  opacity: 0;
+  transform: translateX(-50px);
+  transition: none;
+}
+
+.about-title.slide-in {
+  animation: slideInFromLeft 0.8s ease-out forwards;
+}
+
+.about-highlight {
+  background: #FAEAB1;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.about-name {
+  display: block;
+  width: 100%;
+  max-width: 400px;
+  height: auto;
+  margin-bottom: 15px;
+  margin-top: 0;
+  opacity: 0;
+  transform: translateX(-50px);
+  transition: none;
+}
+
+.about-name.slide-in {
+  animation: slideInFromLeft 0.8s ease-out 0.2s forwards;
+}
+
+.about-crn {
+  font-size: 16px;
+  color: #666;
+  margin-bottom: 30px;
+  font-weight: 500;
+  opacity: 0;
+  transform: translateX(-50px);
+  transition: none;
+}
+
+.about-crn.slide-in {
+  animation: slideInFromLeft 0.8s ease-out 0.3s forwards;
+}
+
+.about-text {
+  font-size: 20px;
+  line-height: 1.8;
+  color: #555;
+  margin-bottom: 20px;
+  opacity: 0;
+  transform: translateX(-50px);
+  transition: none;
+}
+
+.about-text.slide-in {
+  animation: slideInFromLeft 0.8s ease-out forwards;
+}
+
+.about-text:nth-of-type(2).slide-in {
+  animation-delay: 0.4s;
+}
+
+.about-text:nth-of-type(3).slide-in {
+  animation-delay: 0.5s;
+}
+
+@keyframes slideInFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Navegação Mobile Reviews */
+.reviews-nav-mobile {
+  display: flex;
+  justify-content: flex-start;
+  gap: 20px;
+  margin-top: 20px;
+  padding-left: 340px;
+  position: relative;
+  z-index: 1000;
+}
+
+.reviews-nav-mobile .nav-arrow {
+  cursor: pointer;
+  color: #34656D;
+  font-size: 24px;
+  transition: transform 0.2s;
+  position: relative;
+  z-index: 1000;
+  pointer-events: auto;
+}
+
+.reviews-nav-mobile .nav-arrow:hover {
+  transform: scale(1.1);
+}
+
+/* ================= RODAPÉ ================= */
+.footer {
+  background: #FAF8F1;
+  padding: 60px 32px 30px 32px;
+  position: relative;
+}
+
+.footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  max-width: 800px;
+  height: 3px;
+  background: #faeab1;
+}
+
+.footer-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 250px repeat(3, 1fr);
+  gap: 60px;
+  margin-bottom: 40px;
+}
+
+.footer-logo {
+  display: flex;
+  align-items: flex-start;
+}
+
+.footer-logo img {
+  max-width: 150px;
+  height: auto;
+}
+
+.footer-column h4 {
+  font-family: 'Circular Std', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 18px;
+  font-weight: 500;
+  color: #515151;
+  margin-bottom: 20px;
+}
+
+.footer-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.footer-links li {
+  margin-bottom: 12px;
+}
+
+.footer-links a {
+  font-family: 'Circular Std', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 16px;
+  color: #666;
+  text-decoration: none;
+  transition: color 0.3s;
+}
+
+.footer-links a:hover {
+  color: #34656D;
+}
+
+.footer-bottom {
+  text-align: right;
+  padding-top: 20px;
+  border-top: 1px solid rgba(0,0,0,0.1);
+}
+
+.footer-copyright {
+  font-family: 'Circular Std', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-size: 14px;
+  color: #34656D;
+  font-weight: 500;
+}
+
+/* ================= RESPONSIVIDADE ================= */
+@media(max-width: 768px) {
+  .background-hero {
+    background-position: 25% 35%;
+    background-size: 250%; /* O primeiro valor é horizontal, o segundo é vertical */
+  }
+  .hero-container { min-height: 45vh; margin-top: -60px; }
+  .hero { padding: 120px 20px 40px 20px; align-items: center; text-align: center; }
+  .hero h1 { font-size: 32px; }
+  .hero .btn-hero { margin-left: 0; align-self: center; padding: 10px 30px; font-size: 13px; max-width: 280px; }
+
+  .banners-cta-section h2 { font-size: 36px; margin-top: -50px;}
+  .banners-cta-section { padding-left: 0; padding-right: 0; padding-top: 50px; text-align: center; }
+  .banners-cta-section h2, .btn-cta-orange { padding: 8px 18px; }
+
+  .banner-grid-container {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    height: auto;
+    gap: 15px;
+    padding: 0 20px 10px 20px;
+    -webkit-overflow-scrolling: touch;
+  }
+  .banner-grid-container::-webkit-scrollbar { display: none; }
+
+  .banner-item { flex: 0 0 85%; scroll-snap-align: center; }
+  .banner-item:hover { flex: 0 0 85%; }
+  
+  .banner-img-container { height: 250px; }
+  .banner-nav-mobile { display: flex; margin-left: -250px; }
+
+  /* Descrição sempre visível no Mobile */
+  .banner-description { opacity: 1; }
+  
+  .banner-title { text-align: left; }
+  .banner-description { text-align: left; }
+
+  .app-section {
+    flex-direction: column;
+    padding: 60px 20px;
+    gap: 40px;
+  }
+
+  .app-content {
+    text-align: center;
+    max-width: 100%;
+    margin-top: 40px;
+  }
+
+  .app-content h2 {
+    font-size: 36px;
+  }
+
+  .method-subtitle {
+    font-size: 54px;
+  }
+
+  .app-content p {
+    font-size: 16px;
+    line-height: 1.8;
+  }
+
+  .phone-mockup {
+    width: 250px;
+    height: 500px;
+  }
+
+  .menu {
+    max-width: 90%; /* Define que o menu ocupará apenas 90% da largura da tela */
+    margin: 0 auto; /* Mantém ele centralizado */
+    padding: 8px 15px; }
+  .logo-container img { max-height: 40px; }
+  .menu-center { display: none; }
+  .menu-right .btn-outline { display: none; }
+  .menu-right .btn { padding: 8px 12px; font-size: 11px; }
+  .menu-toggle { display: block; }
+  #login-screen { grid-template-columns: 1fr; }
+  .login-right { display: none; }
+  .pricing-container { flex-direction: column; align-items: center; }
+  .pricing-card.side-card { transform: translateY(0); }
+  .pricing-card {
+    /* Diminui o tamanho para 85% do original */
+    transform: scale(0.85); 
+    
+    /* Remove margens negativas que podem causar sobreposição com o zoom menor */
+    margin: -20px 0; 
+    
+    /* Garante que o card não tente ocupar mais espaço do que a tela */
+    max-width: 320px; 
+  }
+  .pricing-container{
+    gap:70px;
+  }
+  
+  .top-hero-dash {
+    padding: 40px 20px;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto auto;
+    text-align: center;
+    gap: 20px;
+  }
+  
+  .hero-dash-content {
+    flex-direction: column;
+    max-width: 100%;
+    grid-column: 1;
+    grid-row: 1 / 4;
+    display: contents;
+  }
+  
+  .hero-dash-badge {
+    font-size: 11px;
+    grid-column: 1;
+    grid-row: 1;
+    align-self: center;
+    padding: 6px 10px;
+    max-width: fit-content;
+    justify-self: center;
+  }
+  
+  .hero-dash-title {
+    font-size: 32px;
+    grid-column: 1;
+    grid-row: 2;
+  }
+  
+  .hero-dash-subtitle {
+    margin-top: -50px;
+    font-size: 62px;
+    grid-column: 1;
+    grid-row: 3;
+  }
+  
+  .hero-dash-image-area {
+    grid-column: 1;
+    grid-row: 4;
+    height: 320px;
+    margin: -20px;
+    margin-left: 150px;
+  }
+  
+  .hero-dash-image {
+    margin-left: -170px;
+    animation: focusInMobile 1.5s ease-out forwards;
+  }
+  
+  @keyframes focusInMobile {
+    from {
+      filter: blur(10px);
+      transform: scale(1.2);
+    }
+    to {
+      filter: blur(0);
+      transform: scale(1.5);
+    }
+  }
+  
+  .hero-dash-stars-bg {
+    width: 300px;
+    height: 300px;
+    right: -80px;
+    z-index: 0;
+    opacity: 0.6;
+  }
+  
+  .hero-dash-text {
+    font-size: 16px;
+    line-height: 1.8;
+    grid-column: 1;
+    grid-row: 5;
+    margin-top: 30px;
+    max-height: 150px;
+    overflow: hidden;
+  }
+  
+  .hero-dash-button {
+    grid-column: 1;
+    grid-row: 6;
+    background: #34656D;
+    color: #FAF8F1;
+    align-self: center;
+    justify-self: center;
+    padding: 10px 20px !important;
+    font-size: 16px;
+    max-width: 200px;
+    width: auto;
+  }
+  
+  .testimonials-section {
+    padding: 50px 20px 60px 20px;
+    margin-top: 60px;
+  }
+  
+  .testimonials-section::before {
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 100" preserveAspectRatio="none"><path d="M0,60 Q300,30 600,60 T1200,60 L1200,100 L0,100 Z" fill="%23f2ebd6"/></svg>');
+  }
+  
+  .testimonials-section::after {
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 100" preserveAspectRatio="none"><path d="M0,0 L1200,0 L1200,40 Q900,70 600,40 T0,40 Z" fill="%23f2ebd6"/></svg>');
+  }
+  
+  .testimonials-title {
+    font-size: 35px;
+  }
+  
+  .testimonials-subtitle {
+    font-size: 70px;
+  }
+  
+  .reviews-grid {
+    grid-template-columns: 1fr;
+    gap: 25px;
+  }
+  
+  .google-rating-box {
+    padding: 30px 20px;
+  }
+  
+  .rating-label {
+    font-size: 24px;
+  }
+  
+  .reviews-cards {
+    padding: 0 20px 10px 20px;
+    margin: 0 -20px;
+  }
+  
+  .reviews-cards::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .review-card {
+    flex: 0 0 85%;
+    min-width: 85%;
+    scroll-snap-align: center;
+  }
+  
+  .reviews-grid.has-more-content::after {
+    display: none;
+  }
+  
+  .reviews-nav-mobile {
+    justify-content: flex-start;
+    padding-left: 20px;
+  }
+  
+  .about-section {
+    padding: 60px 20px;
+  }
+  
+  .about-container {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+  
+  .about-image-wrapper {
+    display: none;
+  }
+  
+  .about-image {
+    max-width: 300px;
+    margin: 0 auto;
+    display: none;
+  }
+  
+  .about-name {
+    max-width: 300px;
+  }
+  
+  .about-text {
+    font-size: 16px;
+    line-height: 1.8;
+  }
+  
+  .footer-container {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+  
+  .footer-logo {
+    justify-content: center;
+  }
+  
+  .footer-logo img {
+    max-width: 120px;
+  }
+  
+  .footer-column h4 {
+    font-size: 16px;
+  }
+  
+  .footer-links a {
+    font-size: 14px;
+  }
+  
+  .footer-bottom {
+    text-align: center;
+  }
+  
+  .footer-copyright {
+    font-size: 12px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="overlay-bg" id="overlayBg" onclick="toggleMobileMenu()"></div>
+
+<nav class="mobile-nav" id="mobileNav">
+    <div class="close-menu" onclick="toggleMobileMenu()"><i class="fas fa-times"></i></div>
+    <a href="#" onclick="toggleMobileMenu()">Sobre mim</a>
+    <a href="#" onclick="toggleMobileMenu()">NutriMeth</a>
+    <a href="#" onclick="toggleMobileMenu()">Guia de Industrializados</a>
+    <button class="btn-outline btn-mobile-login" onclick="toggleMobileMenu()">Entrar</button>
+</nav>
+
+<div id="main-content">
+    <div class="top-bar">
+      <div class="top-bar-track">
+        <span>Aproveite o desconto de verão e trilhe o caminho para um corpo mais saudável | 65% OFF</span>
+        <span>Aproveite o desconto de verão e trilhe o caminho para um corpo mais saudável | 65% OFF</span>
+        <span>Aproveite o desconto de verão e trilhe o caminho para um corpo mais saudável | 65% OFF</span>
+        <span>Aproveite o desconto de verão e trilhe o caminho para um corpo mais saudável | 65% OFF</span>
+      </div>
+    </div>
+
+    <div class="menu-wrapper" id="menu">
+      <div class="menu">
+        <div class="menu-left">
+          <div class="logo-container">
+            <img src="./logo.png" alt="Logo">
+          </div>
+        </div>
+        <div class="menu-center">
+          <a href="#">Sobre mim</a>
+          <a href="#">NutriMeth</a>
+          <a href="#">Guia de Industrializados</a>
+        </div>
+        <div class="menu-right">
+          <button class="btn-outline">Entrar</button>
+          <button class="btn">Quero fazer parte</button>
+          <button class="menu-toggle" onclick="toggleMobileMenu()">
+            <i class="fas fa-bars"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="top-hero-dash">
+      <div class="hero-dash-content">
+        <span class="hero-dash-badge">#1 MÉTODO LÍDER DO MERCADO</span>
+        <h1 class="hero-dash-title">Sua jornada com</h1>
+        <h2 class="hero-dash-subtitle">trilha guiada.</h2>
+        <p class="hero-dash-text">Tenha acesso imediato a guias práticos, calculadoras e mentorias exclusivas desenhadas para transformar sua rotina alimentar sem restrições impossíveis.</p>
+        <button class="hero-dash-button">Quero fazer parte</button>
+      </div>
+      <div class="hero-dash-image-area">
+        <img src="./estrelas.png" alt="Estrelas" class="hero-dash-stars-bg">
+        <img src="./ROSTO2.png" alt="Mulher sorrindo" class="hero-dash-image" id="heroImageLanding">
+      </div>
+    </div>
+
+    <section class="banners-cta-section">
+      <h2><span>Seu próximo passo para alcançar <span style="background: #FAEAB1; padding: 2px 8px;">seu objetivo está aqui.</span></span></h2>
+      <button class="btn-cta-orange">Cadastre-se agora</button>
+
+      <div class="banner-grid-container" id="bannerCarousel">
+        
+        <div class="banner-item">
+          <div class="banner-img-container">
+            <div class="banner-img" style="background-image: url('./img/banner1.png');"></div>
+          </div>
+          <div class="banner-content-outside">
+            <h3 class="banner-title">Resultados reais e duradouros comprovados</h3>
+            <p class="banner-description">Perca peso de forma saudável com acompanhamento personalizado. Mais de 500 alunos já transformaram suas vidas com o método.</p>
+          </div>
+        </div>
+
+        <div class="banner-item">
+          <div class="banner-img-container">
+            <div class="banner-img" style="background-image: url('./img/banner2.png');"></div>
+          </div>
+          <div class="banner-content-outside">
+            <h3 class="banner-title">NutriMeth: O método comprovado cientificamente</h3>
+            <p class="banner-description">Trilha completa com guias, receitas e calculadora de calorias. Tudo que você precisa para alcançar seus objetivos de forma prática.</p>
+          </div>
+        </div>
+
+        <div class="banner-item">
+          <div class="banner-img-container">
+            <div class="banner-img" style="background-image: url('./img/banner3.png');"></div>
+          </div>
+          <div class="banner-content-outside">
+            <h3 class="banner-title">Você não Está sozinho nessa jornada incrível</h3>
+            <p class="banner-description">Acesso à comunidade exclusiva, mentoria especializada e suporte contínuo. Dividimos a jornada com você do início ao fim.</p>
+          </div>
+        </div>
+
+        <div class="banner-item">
+          <div class="banner-img-container">
+            <div class="banner-img" style="background-image: url('./img/banner5.png');"></div>
+          </div>
+          <div class="banner-content-outside">
+            <h3 class="banner-title">Vantagens Exclusivas incríveis para você</h3>
+            <p class="banner-description">Cupons de desconto em marcas parceiras, análise de exames bioquímicos, e-books liberados e muito mais. Invista na sua saúde.</p>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="banner-nav-mobile">
+        <div class="nav-arrow" onclick="scrollBanners('left')"><i class="fas fa-chevron-left"></i></div>
+        <div class="nav-arrow" onclick="scrollBanners('right')"><i class="fas fa-chevron-right"></i></div>
+      </div>
+    </section>
+
+    <section class="pricing-section">
+      <div class="pricing-container">
+        <div class="pricing-card side-card">
+          <h3 class="plan-name">Plano Essencial</h3>
+          <hr>
+          <ul class="features-list">
+            <li><i class="fas fa-check"></i> Calculadora de Calorias</li>
+            <li><i class="fas fa-check"></i> Guia de Industrializados</li>
+            <li><i class="fas fa-check"></i> Guia de Preparo de Marmitas</li>
+            <li><i class="fas fa-check"></i> Guia de Receitas</li>
+            <li><i class="fas fa-check"></i> Guia de Medidas</li>
+            <li><i class="fas fa-check"></i> Lâminas Explicativas</li>
+          </ul>
+          <div class="price-box">
+            <span class="price-main">R$ 39,90</span>
+            <span class="price-sub">À vista</span>
+          </div>
+          <a href="#" class="btn-plan">Eu quero</a>
+        </div>
+
+        <div class="pricing-card featured">
+          <div class="featured-tag">RECOMENDADO</div>
+          <h3 class="plan-name">Plano Performance</h3>
+          <hr>
+          <ul class="features-list">
+            <li><i class="fas fa-check"></i> Acesso a Comunidade</li>
+            <li><i class="fas fa-check"></i> Mentoria (sem retorno)</li>
+            <li><i class="fas fa-check"></i> Avaliação Física</li>
+            <li><i class="fas fa-check"></i> Análise de Exames Bioquímicos</li>
+            <li><i class="fas fa-check"></i> Trilha NutriMeth</li>
+            <li><i class="fas fa-check"></i> E-books (mediante sua escolha)</li>
+            <li><i class="fas fa-check"></i> Cupons de Desconto em marcas</li>
+            <li><i class="fas fa-check"></i> Calculadora de Calorias</li>
+            <li><i class="fas fa-check"></i> Plano Alimentar</li>
+          </ul>
+          <div class="price-box">
+            <p style="font-weight: bold; margin-bottom: 5px; margin-top: -20px;">Mais</p>
+            <span class="price-sub">3x de</span>
+            <span class="price-main">R$ 159,90</span>
+            <span class="price-sub">ou R$ 459,90 à vista</span>
+          </div>
+          <a href="#" class="btn-plan">Eu quero</a>
+        </div>
+
+        <div class="pricing-card side-card">
+          <h3 class="plan-name">Plano Elite</h3>
+          <hr>
+          <ul class="features-list">
+            <li><i class="fas fa-check"></i> Acesso a Comunidade</li>
+            <li><i class="fas fa-check"></i> Mentoria (Quinzenal)</li>
+            <li><i class="fas fa-check"></i> Avaliação Física</li>
+            <li><i class="fas fa-check"></i> Análise de Exames Bioquímicos</li>
+            <li><i class="fas fa-check"></i> Trilha NutriMeth</li>
+            <li><i class="fas fa-check"></i> Entrega de Produtos</li>
+            <li><i class="fas fa-check"></i> Acesso a Eventos</li>
+            <li><i class="fas fa-check"></i> Cupons de Desconto em marcas</li>
+            <li><i class="fas fa-check"></i> Plano Alimentar</li>
+            <li><i class="fas fa-check"></i> Calculadora de Calorias</li>
+            <li><i class="fas fa-check"></i> E-books (Todas categorias liberadas)</li>
+          </ul>
+          <div class="price-box">
+            <p style="font-weight: bold; margin-bottom: 5px; margin-top: -20px;">Mais</p>
+            <span class="price-sub">3x de</span>
+            <span class="price-main">R$ 297,90</span>
+            <span class="price-sub">ou R$ 879,90 à vista</span>
+          </div>
+          <a href="#" class="btn-plan">Eu quero</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="app-section">
+      <div class="app-content">
+        <h2><span class="method-title"><span class="method-highlight">O método nº1 agora</span></span><span class="method-subtitle">na palma da sua mão.</span></h2>
+        <p>Baixe o aplicativo e acompanhe sua jornada nutricional, você terá acesso a trilhas guiadas, conteúdos explicativos e guias práticos.</p>
+        <button class="btn-app">Baixe o APP</button>
+      </div>
+      <div class="app-phone-area">
+        <div class="phone-mockup">
+          <div class="phone-notch"></div>
+          <div class="phone-screen" id="phoneScreen">
+            <img src="./img/app-screen-1.png" alt="App Screen" id="phoneImage">
+          </div>
+        </div>
+        <div class="phone-info">
+          <h3 id="phoneTitle">Home</h3>
+          <p id="phoneDescription">Se familiarize com o APP de forma rápida e prática.</p>
+          <div class="phone-nav-arrows">
+            <div class="nav-arrow" onclick="changePhoneScreen('prev')"><i class="fas fa-chevron-left"></i></div>
+            <div class="nav-arrow" onclick="changePhoneScreen('next')"><i class="fas fa-chevron-right"></i></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div style="text-align: center; padding-bottom: 60px; background: transparent;">
+        <button class="btn">Quero fazer parte agora</button>
+    </div>
+    
+    <section class="testimonials-section">
+      <div class="testimonials-content">
+        <div class="testimonials-title-wrapper">
+          <h2 class="testimonials-title"><span class="testimonials-highlight">O que dizem os</span></h2>
+          <h3 class="testimonials-subtitle">clientes</h3>
+        </div>
+        
+        <div class="reviews-grid">
+          <!-- Caixa de rating do Google -->
+          <div class="google-rating-box">
+            <div class="rating-label">EXCELENTE</div>
+            <div class="rating-stars">
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+              <i class="fas fa-star"></i>
+            </div>
+            <div class="rating-info">Com base em 14 avaliações</div>
+            <svg class="google-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 272 92">
+              <path fill="#EA4335" d="M115.75 47.18c0 12.77-9.99 22.18-22.25 22.18s-22.25-9.41-22.25-22.18C71.25 34.32 81.24 25 93.5 25s22.25 9.32 22.25 22.18zm-9.74 0c0-7.98-5.79-13.44-12.51-13.44S80.99 39.2 80.99 47.18c0 7.9 5.79 13.44 12.51 13.44s12.51-5.55 12.51-13.44z"/>
+              <path fill="#FBBC05" d="M163.75 47.18c0 12.77-9.99 22.18-22.25 22.18s-22.25-9.41-22.25-22.18c0-12.85 9.99-22.18 22.25-22.18s22.25 9.32 22.25 22.18zm-9.74 0c0-7.98-5.79-13.44-12.51-13.44s-12.51 5.46-12.51 13.44c0 7.9 5.79 13.44 12.51 13.44s12.51-5.55 12.51-13.44z"/>
+              <path fill="#4285F4" d="M209.75 26.34v39.82c0 16.38-9.66 23.07-21.08 23.07-10.75 0-17.22-7.19-19.66-13.07l8.48-3.53c1.51 3.61 5.21 7.87 11.17 7.87 7.31 0 11.84-4.51 11.84-13v-3.19h-.34c-2.18 2.69-6.38 5.04-11.68 5.04-11.09 0-21.25-9.66-21.25-22.09 0-12.52 10.16-22.26 21.25-22.26 5.29 0 9.49 2.35 11.68 4.96h.34v-3.61h9.25zm-8.56 20.92c0-7.81-5.21-13.52-11.84-13.52-6.72 0-12.35 5.71-12.35 13.52 0 7.73 5.63 13.36 12.35 13.36 6.63 0 11.84-5.63 11.84-13.36z"/>
+              <path fill="#34A853" d="M225 3v65h-9.5V3h9.5z"/>
+              <path fill="#EA4335" d="M262.02 54.48l7.56 5.04c-2.44 3.61-8.32 9.83-18.48 9.83-12.6 0-22.01-9.74-22.01-22.18 0-13.19 9.49-22.18 20.92-22.18 11.51 0 17.14 9.16 18.98 14.11l1.01 2.52-29.65 12.28c2.27 4.45 5.8 6.72 10.75 6.72 4.96 0 8.4-2.44 10.92-6.14zm-23.27-7.98l19.82-8.23c-1.09-2.77-4.37-4.7-8.23-4.7-4.95 0-11.84 4.37-11.59 12.93z"/>
+              <path fill="#4285F4" d="M35.29 41.41V32H67c.31 1.64.47 3.58.47 5.68 0 7.06-1.93 15.79-8.15 22.01-6.05 6.3-13.78 9.66-24.02 9.66C16.32 69.35.36 53.89.36 34.91.36 15.93 16.32.47 35.3.47c10.5 0 17.98 4.12 23.6 9.49l-6.64 6.64c-4.03-3.78-9.49-6.72-16.97-6.72-13.86 0-24.7 11.17-24.7 25.03 0 13.86 10.84 25.03 24.7 25.03 8.99 0 14.11-3.61 17.39-6.89 2.66-2.66 4.41-6.46 5.1-11.65l-22.49.01z"/>
+            </svg>
+          </div>
+          
+          <!-- Cards de depoimentos -->
+          <div class="reviews-cards">
+            <div class="review-card">
+              <div class="review-header">
+                <div class="review-avatar">S</div>
+                <div class="review-user-info">
+                  <div class="review-name">Simone Ribeiro</div>
+                  <div class="review-date">Há 2 semanas</div>
+                </div>
+                <svg class="review-google-icon" viewBox="0 0 24 24">
+                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                </svg>
+              </div>
+              <div class="review-stars">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+              </div>
+              <div class="review-text">
+                Programa incrível! Consegui emagrecer 8kg em 3 meses sem passar fome. As receitas são deliciosas e o suporte da comunidade é excepcional.
+              </div>
+            </div>
+            
+            <div class="review-card">
+              <div class="review-header">
+                <div class="review-avatar">M</div>
+                <div class="review-user-info">
+                  <div class="review-name">Marina Costa</div>
+                  <div class="review-date">Há 1 mês</div>
+                </div>
+                <svg class="review-google-icon" viewBox="0 0 24 24">
+                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                </svg>
+              </div>
+              <div class="review-stars">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+              </div>
+              <div class="review-text">
+                Melhor investimento que já fiz na minha saúde! O aplicativo é super intuitivo e a calculadora de calorias facilita muito o dia a dia.
+              </div>
+            </div>
+            
+            <div class="review-card">
+              <div class="review-header">
+                <div class="review-avatar">J</div>
+                <div class="review-user-info">
+                  <div class="review-name">Júlia Santos</div>
+                  <div class="review-date">Há 3 semanas</div>
+                </div>
+                <svg class="review-google-icon" viewBox="0 0 24 24">
+                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                </svg>
+              </div>
+              <div class="review-stars">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+              </div>
+              <div class="review-text">
+                Estou amando! As trilhas guiadas são perfeitas para quem não sabe por onde começar. Já recomendei para todas as minhas amigas!
+              </div>
+            </div>
+            
+            <div class="review-card">
+              <div class="review-header">
+                <div class="review-avatar">R</div>
+                <div class="review-user-info">
+                  <div class="review-name">Rafael Oliveira</div>
+                  <div class="review-date">Há 4 dias</div>
+                </div>
+                <svg class="review-google-icon" viewBox="0 0 24 24">
+                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                </svg>
+              </div>
+              <div class="review-stars">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+              </div>
+              <div class="review-text">
+                Resultados incríveis em pouco tempo! O guia de industrializados me ajudou a fazer escolhas mais inteligentes no mercado. Super recomendo!
+              </div>
+            </div>
+            
+            <div class="review-card">
+              <div class="review-header">
+                <div class="review-avatar">C</div>
+                <div class="review-user-info">
+                  <div class="review-name">Carla Mendes</div>
+                  <div class="review-date">Há 1 semana</div>
+                </div>
+                <svg class="review-google-icon" viewBox="0 0 24 24">
+                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                </svg>
+              </div>
+              <div class="review-stars">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+              </div>
+              <div class="review-text">
+                Plataforma completa e fácil de usar! A avaliação física é bem detalhada e me ajudou a entender melhor meu corpo. Vale cada centavo!
+              </div>
+            </div>
+            
+            <div class="review-card">
+              <div class="review-header">
+                <div class="review-avatar">P</div>
+                <div class="review-user-info">
+                  <div class="review-name">Pedro Almeida</div>
+                  <div class="review-date">Há 5 dias</div>
+                </div>
+                <svg class="review-google-icon" viewBox="0 0 24 24">
+                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                </svg>
+              </div>
+              <div class="review-stars">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+              </div>
+              <div class="review-text">
+                Simplesmente transformador! Perdi 12kg em 4 meses seguindo o método. O acompanhamento personalizado faz toda a diferença. Nunca me senti tão bem!
+              </div>
+            </div>
+            
+            <div class="review-card">
+              <div class="review-header">
+                <div class="review-avatar">A</div>
+                <div class="review-user-info">
+                  <div class="review-name">Amanda Ferreira</div>
+                  <div class="review-date">Há 2 dias</div>
+                </div>
+                <svg class="review-google-icon" viewBox="0 0 24 24">
+                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                  <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                </svg>
+              </div>
+              <div class="review-stars">
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+                <i class="fas fa-star"></i>
+              </div>
+              <div class="review-text">
+                Adorei a comunidade! Além do conteúdo excelente, conheci pessoas que estão na mesma jornada. Os cupons de desconto são um ótimo bônus. Recomendo demais!
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="reviews-nav-mobile">
+          <div class="nav-arrow" onclick="scrollReviews('left')"><i class="fas fa-chevron-left"></i></div>
+          <div class="nav-arrow" onclick="scrollReviews('right')"><i class="fas fa-chevron-right"></i></div>
+        </div>
+      </div>
+    </section>
+    
+    <section class="about-section">
+      <div class="about-container">
+        <div class="about-image-wrapper">
+          <img src="./rosto3.png" alt="Nutricionista" class="about-image">
+        </div>
+        <div class="about-content">
+          <h2 class="about-title"><span class="about-highlight">Sobre</span></h2>
+          <img src="./name.png" alt="Évellin Pandolfo" class="about-name">
+          <p class="about-crn">CRN-RS 00000000</p>
+          <p class="about-text">
+            Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat.
+          </p>
+          <p class="about-text">
+            Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi.
+          </p>
+          <p class="about-text">
+            Lorem ipsum dolor sit amet, cons ectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.
+          </p>
+        </div>
+      </div>
+    </section>
+</div>
+
+<footer class="footer">
+  <div class="footer-container">
+    <div class="footer-logo">
+      <img src="./logoreduzido.png" alt="Logo Nutricionista">
+    </div>
+    
+    <div class="footer-column">
+      <h4>Sobre mim</h4>
+      <ul class="footer-links">
+        <li><a href="#sobre">Nutripath</a></li>
+        <li><a href="#industrializados">Guia de Industrializados</a></li>
+      </ul>
+    </div>
+    
+    <div class="footer-column">
+      <h4>Trilha do Paciente</h4>
+      <ul class="footer-links">
+        <li><a href="#ebooks">E-Books</a></li>
+        <li><a href="#receitas">Receitas</a></li>
+      </ul>
+    </div>
+    
+    <div class="footer-column">
+      <h4>Recursos</h4>
+      <ul class="footer-links">
+        <li><a href="#planos">Planos</a></li>
+        <li><a href="#depoimentos">Depoimentos</a></li>
+        <li><a href="#calculadora">Calculadora de Calorias</a></li>
+      </ul>
+    </div>
+  </div>
+  
+  <div class="footer-bottom">
+    <p class="footer-copyright">Évellin Pandolfo® | Todos os direitos reservados</p>
+  </div>
+</footer>
+
+<script>
+function scrollBanners(direction) {
+    const carousel = document.getElementById('bannerCarousel');
+    const scrollAmount = carousel.offsetWidth * 0.8;
+    if(direction === 'left') {
+        carousel.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+    } else {
+        carousel.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+}
+
+function scrollReviews(direction) {
+    const reviewsContainer = document.querySelector('.reviews-cards');
+    const scrollAmount = reviewsContainer.offsetWidth * 0.85;
+    if(direction === 'left') {
+        reviewsContainer.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+    } else {
+        reviewsContainer.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+}
+
+function checkReviewsScroll() {
+    const reviewsContainer = document.querySelector('.reviews-cards');
+    const reviewsGrid = document.querySelector('.reviews-grid');
+    if (!reviewsContainer || !reviewsGrid) return;
+    
+    const scrollLeft = reviewsContainer.scrollLeft;
+    const scrollWidth = reviewsContainer.scrollWidth;
+    const clientWidth = reviewsContainer.clientWidth;
+    
+    // Verifica se há mais conteúdo à direita (com margem de 5px)
+    if (scrollLeft + clientWidth < scrollWidth - 5) {
+        reviewsGrid.classList.add('has-more-content');
+    } else {
+        reviewsGrid.classList.remove('has-more-content');
+    }
+}
+
+// Verificar ao carregar e ao rolar
+window.addEventListener('load', checkReviewsScroll);
+const reviewsContainer = document.querySelector('.reviews-cards');
+if (reviewsContainer) {
+    reviewsContainer.addEventListener('scroll', checkReviewsScroll);
+    // Verificar também ao redimensionar a janela
+    window.addEventListener('resize', checkReviewsScroll);
+}
+
+function toggleMobileMenu() {
+    const mobileNav = document.getElementById('mobileNav');
+    const overlay = document.getElementById('overlayBg');
+    mobileNav.classList.toggle('active');
+    overlay.classList.toggle('active');
+}
+
+window.addEventListener('scroll', () => {
+  const menu = document.getElementById('menu');
+  if (window.scrollY > 50) { menu.classList.add('scrolled'); } 
+  else { menu.classList.remove('scrolled'); }
+});
+
+// Intersection Observer para animar o método nº1 agora quando visível
+const methodTitle = document.querySelector('.method-title');
+if (methodTitle) {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting && !methodTitle.classList.contains('animate')) {
+        methodTitle.classList.add('animate');
+      }
+    });
+  }, { threshold: 0.5 });
+  
+  observer.observe(methodTitle);
+}
+
+// Intersection Observer para animar cards de planos
+const pricingCards = document.querySelectorAll('.pricing-card');
+if (pricingCards.length > 0) {
+  const pricingObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        pricingCards.forEach(card => {
+          if (!card.classList.contains('slide-down')) {
+            card.classList.add('slide-down');
+          }
+        });
+      }
+    });
+  }, { threshold: 0.2 });
+  
+  pricingObserver.observe(pricingCards[0]);
+}
+
+// Intersection Observer para animar títulos dos depoimentos
+const testimonialsTitle = document.querySelector('.testimonials-title');
+const testimonialsSubtitle = document.querySelector('.testimonials-subtitle');
+if (testimonialsTitle && testimonialsSubtitle) {
+  const testimonialsObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        if (!testimonialsTitle.classList.contains('slide-in')) {
+          testimonialsTitle.classList.add('slide-in');
+        }
+        if (!testimonialsSubtitle.classList.contains('slide-down')) {
+          testimonialsSubtitle.classList.add('slide-down');
+        }
+      }
+    });
+  }, { threshold: 0.5 });
+  
+  testimonialsObserver.observe(testimonialsTitle);
+}
+
+// Intersection Observer para animar elementos do Sobre
+const aboutContent = document.querySelector('.about-content');
+if (aboutContent) {
+  const aboutElementsObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const title = aboutContent.querySelector('.about-title');
+        const name = aboutContent.querySelector('.about-name');
+        const crn = aboutContent.querySelector('.about-crn');
+        const texts = aboutContent.querySelectorAll('.about-text');
+        
+        if (title && !title.classList.contains('slide-in')) {
+          title.classList.add('slide-in');
+        }
+        if (name && !name.classList.contains('slide-in')) {
+          name.classList.add('slide-in');
+        }
+        if (crn && !crn.classList.contains('slide-in')) {
+          crn.classList.add('slide-in');
+        }
+        texts.forEach(text => {
+          if (!text.classList.contains('slide-in')) {
+            text.classList.add('slide-in');
+          }
+        });
+      }
+    });
+  }, { threshold: 0.3 });
+  
+  aboutElementsObserver.observe(aboutContent);
+}
+
+// Intersection Observer para animar a imagem do Sobre
+const aboutImage = document.querySelector('.about-image');
+if (aboutImage) {
+  const imageObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting && !aboutImage.classList.contains('reveal')) {
+        aboutImage.classList.add('reveal');
+      }
+    });
+  }, { threshold: 0.3 });
+  
+  imageObserver.observe(aboutImage);
+}
+
+// Remover cursor piscante após a animação de digitação
+setTimeout(() => {
+  const badge = document.querySelector('.hero-dash-badge');
+  if (badge) {
+    badge.classList.add('typed');
+  }
+}, 2000);
+
+// Intersection Observer para animar banners quando visíveis
+const bannerObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const banners = entry.target.querySelectorAll('.banner-item');
+      banners.forEach(banner => {
+        banner.classList.add('animate');
+      });
+      bannerObserver.unobserve(entry.target);
+    }
+  });
+}, {
+  threshold: 0.2
+});
+
+const bannerContainer = document.getElementById('bannerCarousel');
+if (bannerContainer) {
+  bannerObserver.observe(bannerContainer);
+}
+
+// Carrossel de telas do app
+const appScreens = [
+  {
+    image: '/img/app-screen-1.png',
+    title: 'Home',
+    description: 'Se familiarize com o APP de forma rápida e prática.'
+  },
+  {
+    image: '/img/app-screen-2.png',
+    title: 'Trilhas Guiadas',
+    description: 'Acompanhe seu progresso com trilhas personalizadas.'
+  },
+  {
+    image: '/img/app-screen-3.png',
+    title: 'Receitas',
+    description: 'Acesse centenas de receitas saudáveis e práticas.'
+  },
+  {
+    image: '/img/app-screen-4.png',
+    title: 'Calculadora',
+    description: 'Calcule suas calorias e macronutrientes facilmente.'
+  }
+];
+
+let currentScreenIndex = 0;
+let isAnimating = false;
+
+function changePhoneScreen(direction) {
+  if (isAnimating) return;
+  
+  isAnimating = true;
+  const title = document.getElementById('phoneTitle');
+  const description = document.getElementById('phoneDescription');
+  const phoneImage = document.getElementById('phoneImage');
+  
+  // Determinar a direção da animação
+  const slideClass = direction === 'next' ? 'fade-out' : 'slide-right';
+  
+  // Adicionar animação de saída
+  title.classList.add(slideClass);
+  description.classList.add(slideClass);
+  phoneImage.style.opacity = '0.3';
+  phoneImage.style.transform = 'scale(0.95)';
+  phoneImage.style.transition = 'all 0.3s ease';
+  
+  setTimeout(() => {
+    // Atualizar o índice
+    if (direction === 'next') {
+      currentScreenIndex = (currentScreenIndex + 1) % appScreens.length;
+    } else {
+      currentScreenIndex = (currentScreenIndex - 1 + appScreens.length) % appScreens.length;
+    }
+    
+    const currentScreen = appScreens[currentScreenIndex];
+    
+    // Atualizar conteúdo
+    phoneImage.src = currentScreen.image;
+    title.textContent = currentScreen.title;
+    description.textContent = currentScreen.description;
+    
+    // Remover classes de saída
+    title.classList.remove(slideClass);
+    description.classList.remove(slideClass);
+    
+    // Adicionar animação de entrada
+    setTimeout(() => {
+      phoneImage.style.opacity = '1';
+      phoneImage.style.transform = 'scale(1)';
+      title.classList.add('fade-in');
+      description.classList.add('fade-in');
+      
+      setTimeout(() => {
+        title.classList.remove('fade-in');
+        description.classList.remove('fade-in');
+        isAnimating = false;
+      }, 400);
+    }, 50);
+  }, 400);
+}
+</script>
+
+</body>
+</html>
