@@ -1,0 +1,2453 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Calorias - Évellin Pandolfo</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Swirly+Canalope&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        @font-face {
+            font-family: 'SwirlyCanalope_PERSONAL_USE_ONLY';
+            src: url('./SwirlyCanalope_PERSONAL_USE_ONLY.otf') format('opentype');
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            font-family: 'Segoe UI', -apple-system, sans-serif; 
+            background: #FAF8F1; 
+            color: #4a5568; 
+            line-height: 1.6;
+            padding: 20px;
+        }
+        
+        .container { 
+            max-width: 650px; 
+            margin: 0 auto; 
+            background: #FAF8F1; 
+            padding: 50px 40px;
+            border-radius: 30px;
+            position: relative;
+            overflow: visible;
+        }
+
+        /* Decorative stars background */
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 200px;
+            height: 200px;
+            background-image: url('./estrelas.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+        
+        /* Logo */
+        .logo {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .logo img {
+            max-width: 56%;
+            height: auto;
+        }
+
+        .logo h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            color: #34656D;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .logo p {
+            font-size: 0.75rem;
+            color: #34656D;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            font-weight: 400;
+        }
+        
+        /* Title */
+        h1 { 
+            text-align: center; 
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        h1 .title-normal {
+            display: block;
+            font-family: 'Circular Std Medium', 'Circular Std', 'Segoe UI', sans-serif;
+            font-size: 1.95rem;
+            color: #515151;
+            font-weight: 500;
+            background: #FAEAB1;
+            padding: 2px 8px;
+            border-radius: 4px;
+            width: fit-content;
+            margin: 0 auto;
+        }
+
+        h1 .title-fancy {
+            display: block;
+            font-family: 'SwirlyCanalope_PERSONAL_USE_ONLY', 'Swirly Canalope', serif;
+  font-size: 120px;
+  color: #34656D;
+  font-style: normal;
+            font-weight: 300;
+            margin-top: -55px;
+            animation: slideInFromTop 1s ease-out 0.8s forwards;
+        }
+        
+        .form-group { 
+            margin-bottom: 24px; 
+            position: relative; 
+        }
+
+        label { 
+            display: block; 
+            font-weight: 600; 
+            margin-bottom: 10px; 
+            font-size: 0.9rem; 
+            color: #4a5568;
+        }
+
+        input, select { 
+            width: 100%; 
+            padding: 16px 20px; 
+            border: 2px solid #D1D5DB; 
+            border-radius: 50px; 
+            box-sizing: border-box; 
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            background: #FAF8F1;
+            color: #6b7280;
+        }
+
+        input::placeholder {
+            color: #9ca3af;
+        }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: #34656D;
+        }
+
+        .row {
+            display: flex;
+            gap: 15px;
+        }
+
+        .row .form-group {
+            flex: 1;
+        }
+        
+        /* Custom NAF Dropdown */
+        .custom-select-wrapper { 
+            position: relative; 
+            width: 100%; 
+            z-index: 9999;
+        }
+
+        .custom-select { 
+            cursor: pointer; 
+            border: 2px solid #D1D5DB; 
+            border-radius: 50px; 
+            padding: 16px 20px; 
+            background: #FAF8F1; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            transition: all 0.3s ease;
+            color: #6b7280;
+        }
+
+        .custom-select:hover {
+            border-color: #34656D;
+        }
+
+        .custom-options { 
+            display: none; 
+            position: absolute; 
+            top: 100%; 
+            left: 0; 
+            right: 0; 
+            background: #FAF8F1; 
+            border: 2px solid #34656D; 
+            border-radius: 20px; 
+            z-index: 9999; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15); 
+            max-height: 350px; 
+            overflow-y: auto; 
+            margin-top: 8px; 
+        }
+
+        .custom-options.show { 
+            display: block; 
+        }
+
+        .form-group.naf-group {
+            position: relative;
+            z-index: 50;
+        }
+
+        .form-group.naf-group .custom-options {
+            z-index: 100;
+        }
+
+        .option-item { 
+            padding: 14px 20px; 
+            border-bottom: 1px solid #f1f5f9; 
+            cursor: pointer; 
+            transition: background 0.2s ease; 
+        }
+
+        .option-item:hover { 
+            background: #f0f7ff; 
+        }
+
+        .option-title { 
+            font-weight: 600; 
+            color: #34656D; 
+            display: block; 
+            font-size: 0.9rem;
+        }
+
+        .option-desc { 
+            font-size: 0.8rem; 
+            color: #6b7280; 
+            margin-top: 4px; 
+            display: block; 
+            line-height: 1.3; 
+        }
+
+        /* Activities Section */
+        .activities-section {
+            margin: 80px 0;
+            position: relative;
+            z-index: 1;
+        }
+
+        .activities-title {
+            text-align: center;
+            margin-bottom: 20px;
+            white-space: normal;
+        }
+
+        .activities-title .title-normal {
+            display: block;
+            font-family: 'Circular Std Medium', 'Circular Std', 'Segoe UI', sans-serif;
+            font-size: 1.95rem;
+            color: #515151;
+            font-weight: 500;
+            background: #FAEAB1;
+            padding: 2px 8px;
+            border-radius: 4px;
+            width: fit-content;
+            margin: 0 auto;
+        }
+
+        .activities-title .title-fancy {
+            display: block;
+            font-family: 'SwirlyCanalope_PERSONAL_USE_ONLY', 'Swirly Canalope', serif;
+            font-size: 120px;
+            color: #34656D;
+            font-style: normal;
+            font-weight: 300;
+            margin: -76px auto 0;
+            width: 100%;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .btn-add-activity {
+            width: 100%;
+            padding: 18px;
+            background: #34656D;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-add-activity:hover {
+            background: #2a5159;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 101, 109, 0.3);
+        }
+
+        /* Activity Tags */
+        .activity-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .activity-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 20px;
+            background: white;
+            border: 2px dashed #34656D;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            color: #4a5568;
+        }
+
+        .activity-tag .remove-btn {
+            cursor: pointer;
+            color: #34656D;
+            font-weight: bold;
+            transition: color 0.2s;
+        }
+
+        .activity-tag .remove-btn:hover {
+            color: #d9534f;
+        }
+
+        /* Modal MET */
+        .modal { 
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(0,0,0,0.7); 
+            align-items: flex-start; 
+            justify-content: center; 
+            z-index: 10001; 
+            padding-top: 50px; 
+        }
+
+        .modal-content { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 20px; 
+            width: 95%; 
+            max-width: 600px; 
+            position: relative; 
+            max-height: 85vh; 
+            display: flex; 
+            flex-direction: column;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        /* Search List below input */
+        .search-container { 
+            position: relative; 
+        }
+
+        #metSearchResults { 
+            position: absolute; 
+            top: 100%; 
+            left: 0; 
+            right: 0; 
+            background: white; 
+            border: 2px solid #34656D; 
+            border-radius: 0 0 15px 15px; 
+            max-height: 250px; 
+            overflow-y: auto; 
+            z-index: 101; 
+            display: none; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15); 
+        }
+
+        .met-item { 
+            padding: 12px 18px; 
+            cursor: pointer; 
+            border-bottom: 1px solid #f1f5f9; 
+            font-size: 0.85rem; 
+            line-height: 1.4;
+            transition: background 0.2s ease;
+        }
+
+        .met-item:hover { 
+            background: #f0f7ff; 
+            color: #34656D; 
+        }
+
+        /* Results Section */
+        #resultado { 
+            display: none; 
+            margin-top: 40px;
+        }
+
+        .result-item {
+            background: #FAF8F1;
+            padding: 25px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .result-icon {
+            font-size: 3.5rem;
+            flex-shrink: 0;
+        }
+
+        .result-icon img {
+            width: 5.52rem;
+            height: 5.52rem;
+            object-fit: contain;
+        }
+
+        .result-icon.fire {
+            color: #F59E0B;
+            filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.3));
+        }
+
+        .result-icon.battery {
+            color: #FCD34D;
+            filter: drop-shadow(0 0 10px rgba(252, 211, 77, 0.3));
+        }
+
+        .result-content {
+            flex: 1;
+        }
+
+        .result-label {
+            font-size: 1rem;
+            color: #4a5568;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .result-value {
+            font-family: 'Circular Std Black', 'Circular Std', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 3.5rem;
+            margin-top: -10px;
+            font-weight: 700;
+            color: #2D5F5D;
+        }
+
+        .result-method {
+            text-align: center;
+            font-size: 1rem;
+            color: #6b7280;
+            font-style: italic;
+            margin: 20px 0 30px 0;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 18px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-download {
+            background: #34656D;
+            color: white;
+        }
+
+        .btn-download:hover {
+            background: #2a5159;
+            transform: translateY(-2px);
+        }
+
+        .btn-share {
+            background: #4a5568;
+            color: white;
+        }
+
+        .btn-share:hover {
+            background: #374151;
+            transform: translateY(-2px);
+        }
+
+        .btn-calculate {
+            width: 100%;
+            padding: 18px;
+            background: #34656D;
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .btn-calculate:hover {
+            background: #2a5159;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 101, 109, 0.3);
+        }
+
+        /* Reveal on view */
+        .reveal-item {
+            opacity: 0;
+            transform: translateY(16px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .reveal-item.in-view {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 12px;
+            }
+
+            .container { 
+                padding: 30px 25px; 
+            }
+
+            .logo img {
+                max-width: 70%;
+            }
+
+            h1 .title-normal {
+                font-size: 1.44rem;
+            }
+
+            h1 .title-fancy {
+                font-size: 5rem;
+                margin-top: -35px;
+            }
+
+            .activities-title .title-normal {
+                font-size: 1.44rem;
+            }
+
+            .activities-title .title-fancy {
+                font-size: 4.5rem;
+                margin-top: -50px;
+                margin-left: -10px;
+                white-space: nowrap;
+            }
+
+            label {
+                font-size: 0.85rem;
+            }
+
+            input, select {
+                padding: 14px 16px;
+                font-size: 0.9rem;
+            }
+
+            .custom-select {
+                padding: 14px 16px;
+                font-size: 0.9rem;
+            }
+
+            .custom-options {
+                max-height: 280px;
+            }
+
+            .row {
+                flex-direction: column;
+            }
+
+            .btn-add-activity,
+            .btn-calculate,
+            .btn {
+                padding: 16px;
+                font-size: 0.95rem;
+            }
+
+            .result-item {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+                gap: 12px;
+            }
+
+            .result-value {
+                font-size: 2.5rem;
+            }
+
+            .activity-tags {
+                gap: 8px;
+            }
+
+            .activity-tag {
+                font-size: 0.8rem;
+                padding: 10px 16px;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="logo">
+        <img src="./logo2cor.png" alt="Logo">
+    </div>
+
+    <h1>
+        <span class="title-normal">Calculadora de</span>
+        <span class="title-fancy">calorias</span>
+    </h1> 
+    <style>
+        .custom-select-wrapper {
+            position: relative;
+            z-index: 2000;
+        }
+
+        .custom-options {
+            border-radius: 10px; 
+            z-index: 3000; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15); 
+            max-height: 400px; 
+            overflow-y: auto; 
+            margin-top: 5px; 
+        }
+        .custom-options.show { display: block; }
+        .option-item { padding: 14px; border-bottom: 1px solid #f1f5f9; cursor: pointer; transition: background 0.2s ease; }
+        .option-item:hover { background: #f0f7ff; }
+        .option-title { font-weight: bold; color: #34656D; display: block; }
+        .option-desc { font-size: 0.85rem; color: #64748b; margin-top: 4px; display: block; line-height: 1.3; }
+
+        /* Modal MET */
+        .modal { 
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(0,0,0,0.7); 
+            align-items: flex-start; 
+            justify-content: center; 
+            z-index: 10001; 
+            padding-top: 50px; 
+        }
+        .modal-content { 
+            background: white; 
+            padding: 30px; 
+            border-radius: 20px; 
+            width: 95%; 
+            max-width: 600px; 
+            position: relative; 
+            max-height: 85vh; 
+            display: flex; 
+            flex-direction: column;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        
+        /* Search List below input */
+        .search-container { position: relative; }
+        #metSearchResults { 
+            position: absolute; 
+            top: 100%; 
+            left: 0; 
+            right: 0; 
+            background: white; 
+            border: 2px solid #34656D; 
+            border-radius: 0 0 10px 10px; 
+            max-height: 250px; 
+            overflow-y: auto; 
+            z-index: 101; 
+            display: none; 
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15); 
+        }
+        .met-item { 
+            padding: 12px; 
+            cursor: pointer; 
+            border-bottom: 1px solid #f1f5f9; 
+            font-size: 0.9rem; 
+            line-height: 1.4;
+            transition: background 0.2s ease;
+        }
+        .met-item:hover { background: #f0f7ff; color: #34656D; }
+
+        .btn { 
+            border: none; 
+            border-radius: 12px; 
+            padding: 16px; 
+            width: 100%; 
+            font-weight: 600; 
+            cursor: pointer; 
+            transition: all 0.3s ease;
+            font-size: 1.05rem;
+        }
+        .btn-primary { 
+            background: #34656D; 
+            color: white; 
+            margin-top: 25px; 
+        }
+        .btn-primary:hover {
+            background: #2a5159;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 101, 109, 0.3);
+        }
+        .btn-secondary { 
+            background: #10b981; 
+            color: white; 
+            margin-top: 10px; 
+        }
+        .btn-secondary:hover {
+            background: #059669;
+            transform: translateY(-2px);
+        }
+        
+        .activity-added { 
+            margin-top: 20px; 
+            border: 2px solid #e5e5e5; 
+            border-radius: 12px; 
+            padding: 16px; 
+            background: #f8fafc; 
+        }
+        .activity-row { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 10px 0; 
+            border-bottom: 1px solid #edf2f7; 
+            font-size: 0.9rem; 
+        }
+        .activity-row:last-child { border-bottom: none; }
+        
+        #resultado { 
+            display: none; 
+            margin-top: 30px; 
+            padding: 30px; 
+            border-radius: 15px; 
+            background: #FAF8F1; 
+            border: 2px solid #FAF8F1; 
+        }
+        .res-box { 
+            font-size: 1.8rem; 
+            font-weight: 800; 
+            color: #166534; 
+            display: block; 
+            margin-top: 8px; 
+        }
+
+        /* Mobile Menu Toggle */
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+        }
+        .menu-toggle span {
+            width: 25px;
+            height: 3px;
+            background: #34656D;
+            margin: 3px 0;
+            transition: 0.3s;
+        }
+
+        @media (max-width: 768px) {
+            .menu { padding: 15px 20px; }
+            .menu-center, .menu-right { display: none; }
+            .menu-toggle { display: flex; }
+            .container { padding: 25px 20px; }
+            h1 { font-size: 1.7rem; }
+        }
+    </style>
+
+<div class="page-content">
+    
+    <div class="form-group">
+        <label>Nome Completo</label>
+        <input type="text" id="nome" placeholder="Ex: João da Silva">
+    </div>
+
+    <div class="row">
+        <div class="form-group">
+            <label>Sexo</label>
+            <select id="sexo">
+                <option value="">Selecione aqui</option>
+                <option value="m">Masculino</option>
+                <option value="f">Feminino</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Idade</label>
+            <input type="number" id="idade" placeholder="Ex: 25">
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="form-group">
+            <label>Peso (kg)</label>
+            <input type="number" id="peso" placeholder="Ex: 80.5">
+        </div>
+        <div class="form-group">
+            <label>Altura (cm)</label>
+            <input type="number" id="altura" placeholder="Ex: 170">
+        </div>
+    </div>
+
+    <div class="form-group naf-group">
+        <label>Nível de Atividade (NAF)</label>
+        <div class="custom-select-wrapper">
+            <div class="custom-select" id="nafSelected" onclick="toggleNafDropdown()">
+                <span id="nafValue">Selecione o nível...</span>
+                <span>▼</span>
+            </div>
+            <div class="custom-options" id="nafOptions">
+                <div class="option-item" onclick="selectNaf(1.2, 'Sedentário (1,2)', '(Trabalhos domésticos de esforço leve a moderado, caminhadas para atividades relacionadas com o cotidiano, ficar sentado por várias horas.)')">
+                    <span class="option-title">Sedentário (1,2)</span>
+                    <span class="option-desc">(Trabalhos domésticos de esforço leve a moderado, caminhadas para atividades relacionadas com o cotidiano, ficar sentado por várias horas.)</span>
+                </div>
+                <div class="option-item" onclick="selectNaf(1.375, 'Pouca (1,375)', '(Caminhadas (6,4 km/h), além das mesmas atividades relacionadas ao NAF sedentário.)')">
+                    <span class="option-title">Pouca (1,375)</span>
+                    <span class="option-desc">(Caminhadas (6,4 km/h), além das mesmas atividades relacionadas ao NAF sedentário.)</span>
+                </div>
+                <div class="option-item" onclick="selectNaf(1.55, 'Moderada (1,55)', '(Ginástica aeróbica, corrida, natação, jogar tênis, além das atividades relacionadas ao NAF sedentário.)')">
+                    <span class="option-title">Moderada (1,55)</span>
+                    <span class="option-desc">(Ginástica aeróbica, corrida, natação, jogar tênis, além das atividades relacionadas ao NAF sedentário.)</span>
+                </div>
+                <div class="option-item" onclick="selectNaf(1.725, 'Intensa (1,725)', '(Ciclismo de intensidade moderada, corrida, pular corda, jogar tênis, além das atividades relacionadas ao NAF sedentário.)')">
+                    <span class="option-title">Intensa (1,725)</span>
+                    <span class="option-desc">(Ciclismo de intensidade moderada, corrida, pular corda, jogar tênis, além das atividades relacionadas ao NAF sedentário.)</span>
+                </div>
+                <div class="option-item" onclick="selectNaf(1.9, 'Muito intensa (1,9)', '(Ciclismo de intensidade intensa, corrida, pular corda, jogar tênis, além das atividades relacionadas ao NAF sedentário.)')">
+                    <span class="option-title">Muito intensa (1,9)</span>
+                    <span class="option-desc">(Ciclismo de intensidade intensa, corrida, pular corda, jogar tênis, além das atividades relacionadas ao NAF sedentário.)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="activities-section">
+        <div class="activities-title">
+            <span class="title-normal">Especifique suas</span>
+            <span class="title-fancy">atividades físicas</span>
+        </div>
+        <button class="btn-add-activity" onclick="openModal()">+Adicionar atividades físicas</button>
+        <div class="activity-tags" id="listaVisual" style="display:none;"></div>
+    </div>
+
+    <button class="btn-calculate" onclick="calcular()">Calcular</button>
+
+    <div id="resultado">
+        <div class="result-item">
+            <div class="result-icon fire"><img src="icon-calorias.png" alt="Calorias"></div>
+            <div class="result-content">
+                <div class="result-label">Taxa Metabólica Basal</div>
+                <div class="result-value" id="res-tmb">0 kcal</div>
+            </div>
+        </div>
+
+        <div class="result-item">
+            <div class="result-icon battery"><img src="icon-gasto-energetico.png" alt="Gasto Energético"></div>
+            <div class="result-content">
+                <div class="result-label">Gasto Energético Total (GET)</div>
+                <div class="result-value" id="res-get">0 kcal</div>
+            </div>
+        </div>
+
+        <div class="result-method" id="res-metodo"></div>
+
+        <div class="action-buttons">
+            <button class="btn btn-download" onclick="baixarPDF()">Baixar PDF</button>
+            <button class="btn btn-share" onclick="compartilhar()">Compartilhar</button>
+        </div>
+    </div>
+</div>
+
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <h3 style="color: #34656D; margin-bottom: 20px;">Buscar Atividade no Compêndio</h3>
+        <div class="form-group search-container">
+            <label>Digite o nome da atividade</label>
+            <input type="text" id="metInput" onkeyup="searchMet()" placeholder="Ex: Corrida, Caminhada..." autocomplete="off" style="border-radius: 10px;">
+            <div id="metSearchResults"></div>
+        </div>
+        
+        <div style="display: flex; gap: 15px;">
+            <div class="form-group" style="flex:1;">
+                <label>Duração (min)</label>
+                <input type="number" id="metDur" value="30" style="border-radius: 10px;">
+            </div>
+            <div class="form-group" style="flex:1;">
+                <label>Frequência</label>
+                <input type="number" id="metFreq" value="1" style="border-radius: 10px;">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Período</label>
+            <select id="metPer" style="border-radius: 10px;">
+                <option value="1">Por Dia</option>
+                <option value="7">Por Semana</option>
+                <option value="30">Por Mês</option>
+            </select>
+        </div>
+
+        <button class="btn-calculate" onclick="addActivity()">Confirmar e Adicionar</button>
+        <button class="btn" style="background:#9ca3af; color: white; margin-top:10px; border-radius: 50px; padding: 14px; width: 100%; border: none; cursor: pointer;" onclick="closeModal()">Fechar</button>
+    </div>
+</div>
+
+<script>
+    // BASE DE DADOS COMPLETA (Páginas 1-28)
+    // Carregamento dinâmico via Script para não poluir o HTML
+    let MET_DATABASE = [];
+
+    // Função para carregar os dados (Simulação do arquivo TXT fornecido)
+    // Devido ao limite de tamanho do script em uma única resposta, os dados são injetados aqui.
+    async function loadMetData() {
+        // Abaixo está uma representação comprimida dos dados das 28 páginas.
+        // O buscador filtrará entre as 1.097 linhas.
+        const rawData = [
+            {"c":"01003","m":14.0,"d":"Ciclismo, mountain bike, subida, vigoroso"},
+{"c":"01004","m":16.0,"d":"Ciclismo, mountain bike, corrida competitiva"},
+{"c":"01008","m":8.5,"d":"Ciclismo, BMX"},
+{"c":"01009","m":8.5,"d":"Ciclismo, mountain bike, geral"},
+{"c":"01010","m":4.0,"d":"Ciclismo, <16 km/h, lazer, para o trabalho ou prazer"},
+{"c":"01011","m":6.8,"d":"Ciclismo, para/do trabalho, ritmo próprio"},
+{"c":"01013","m":5.8,"d":"Ciclismo, em estrada de terra ou fazenda, ritmo moderado"},
+{"c":"01014","m":7.0,"d":"Ciclismo, geral"},
+{"c":"01015","m":4.3,"d":"Ciclismo, ritmo fácil selecionado pelo próprio"},
+{"c":"01016","m":7.0,"d":"Ciclismo, ritmo moderado selecionado pelo próprio"},
+{"c":"01017","m":9.0,"d":"Ciclismo, ritmo vigoroso selecionado pelo próprio"},
+{"c":"01018","m":3.5,"d":"Ciclismo, lazer 8,8 km/h"},
+{"c":"01019","m":5.8,"d":"Ciclismo, lazer, 15 km/h"},
+{"c":"01020","m":6.8,"d":"Ciclismo, 16-19 km/h, lazer, lento, esforço leve"},
+{"c":"01030","m":8.0,"d":"Ciclismo, 19-22 km/h, lazer, esforço moderado"},
+{"c":"01040","m":10.0,"d":"Ciclismo, 22-25 km/h, corrida ou lazer, rápido, esforço vigoroso"},
+{"c":"01050","m":12.0,"d":"Ciclismo, 25-30 km/h, corrida/sem vácuo ou >30 km/h no vácuo"},
+{"c":"01060","m":16.8,"d":"Ciclismo, >32 km/h, corrida, sem vácuo"},
+{"c":"01065","m":8.5,"d":"Ciclismo, 19 km/h, sentado, mãos nos freios ou guidão baixo, 80 rpm"},
+{"c":"01066","m":9.0,"d":"Ciclismo, 19 km/h, em pé, mãos nos freios, 60 rpm"},
+{"c":"01070","m":5.0,"d":"Monociclo"},
+{"c":"01080","m":6.8,"d":"E-bike (assistência elétrica) sem suporte eletrônico"},
+{"c":"01084","m":6.0,"d":"E-bike (assistência elétrica) com suporte eletrônico leve"},
+{"c":"01088","m":4.0,"d":"E-bike (assistência elétrica) com alto suporte eletrônico"},
+{"c":"01200","m":6.8,"d":"Ciclismo, estacionário, geral"},
+{"c":"01210","m":3.5,"d":"Ciclismo, estacionário, 25-30 watts, esforço muito leve a leve"},
+{"c":"01214","m":4.0,"d":"Ciclismo, estacionário, 50 watts, esforço leve"},
+{"c":"01216","m":5.0,"d":"Ciclismo, estacionário, 60 watts, esforço leve a moderado"},
+{"c":"01218","m":5.8,"d":"Ciclismo, estacionário, 70-80 watts"},
+{"c":"01220","m":6.0,"d":"Ciclismo, estacionário, 90-100 watts, moderado a vigoroso"},
+{"c":"01224","m":6.8,"d":"Ciclismo, estacionário, 101-125 watts"},
+{"c":"01228","m":8.0,"d":"Ciclismo, estacionário, 126-150 watts"},
+{"c":"01232","m":10.3,"d":"Ciclismo, estacionário, 151-199 watts"},
+{"c":"01236","m":10.8,"d":"Ciclismo, estacionário, 200-229 watts, vigoroso"},
+{"c":"01240","m":12.5,"d":"Ciclismo, estacionário, 230-250 watts, muito vigoroso"},
+{"c":"01244","m":13.8,"d":"Ciclismo, estacionário, 270-305 watts, muito vigoroso"},
+{"c":"01248","m":16.3,"d":"Ciclismo, estacionário, >325 watts, muito vigoroso"},
+{"c":"01252","m":5.5,"d":"Ciclismo, apenas concêntrico, 100 W"},
+{"c":"01254","m":11.0,"d":"Ciclismo, apenas concêntrico, 200 W"},
+{"c":"01262","m":2.3,"d":"Ciclismo, apenas excêntrico, 100 a 149 W"},
+{"c":"01264","m":4.0,"d":"Ciclismo, apenas excêntrico, 200 W"},
+{"c":"01270","m":9.0,"d":"Ciclismo, estacionário, aula de RPM/Spinning"},
+{"c":"01290","m":8.8,"d":"Ciclismo, ciclismo virtual interativo, ergômetro interno"},
+{"c":"01305","m":8.8,"d":"Ciclismo, treinamento intervalado de alta intensidade (HIIT)"},
+{"c":"02000","m":7.3,"d":"Exercício de condicionamento, aeróbica, geral"},
+{"c":"02001","m":5.5,"d":"Aeróbica, step, com degrau de 10 cm"},
+{"c":"02002","m":7.3,"d":"Aeróbica, step, com degrau de 15-20 cm"},
+{"c":"02003","m":9.0,"d":"Aeróbica, step, com degrau de 25-30 cm"},
+{"c":"02004","m":7.8,"d":"Aula de step (bench step), geral"},
+{"c":"02005","m":4.8,"d":"Dança aeróbica, baixo impacto, esforço moderado"},
+{"c":"02006","m":8.0,"d":"Dança aeróbica, alto impacto, esforço vigoroso"},
+{"c":"02007","m":10.0,"d":"Dança aeróbica usando pesos de 4,5-6,8 kg"},
+{"c":"02008","m":5.0,"d":"Pista de obstáculos tipo exército, programa boot camp"},
+{"c":"02020","m":7.5,"d":"Calistenia (flexões, abdominais, burpees, cordas navais), vigoroso"},
+{"c":"02022","m":3.8,"d":"Calistenia (flexões, abdominais, afundos), esforço moderado"},
+{"c":"02024","m":2.8,"d":"Calistenia (abdominais curtos, prancha), esforço leve"},
+{"c":"02030","m":3.5,"d":"Calistenia, esforço leve ou moderado, geral (ex: costas)"},
+{"c":"02032","m":6.0,"d":"Treino em circuito, exercícios com peso corporal"},
+{"c":"02034","m":3.5,"d":"Treino em circuito, esforço leve"},
+{"c":"02035","m":5.0,"d":"Treino em circuito, esforço moderado"},
+{"c":"02040","m":7.5,"d":"Treino em circuito, incluindo kettlebells, intensidade vigorosa"},
+{"c":"02045","m":3.5,"d":"Rotinas de exercícios Curves™ para mulheres"},
+{"c":"02048","m":5.0,"d":"Elíptico, esforço moderado"},
+{"c":"02049","m":9.0,"d":"Elíptico, esforço vigoroso"},
+{"c":"02050","m":6.0,"d":"Resistência (musculação), powerlifting ou fisiculturismo, vigoroso"},
+{"c":"02052","m":5.0,"d":"Treino de resistência (peso), agachamentos, levantamento terra"},
+{"c":"02054","m":3.5,"d":"Treino de resistência, múltiplos exercícios, 8-15 repetições"},
+{"c":"02055","m":5.8,"d":"Treino de resistência, circuito, superséries recíprocas"},
+{"c":"02056","m":3.0,"d":"Exercícios de resistência com peso corporal, geral"},
+{"c":"02057","m":6.5,"d":"Exercícios de resistência com peso corporal, alta intensidade"},
+{"c":"02058","m":9.8,"d":"Kettlebell swings"},
+{"c":"02060","m":5.5,"d":"Exercício em academia, geral"},
+{"c":"02061","m":5.0,"d":"Aulas de ginástica em academia, treino combinado"},
+{"c":"02062","m":7.8,"d":"Exercício em academia, aulas de condicionamento"},
+{"c":"02064","m":3.8,"d":"Exercício em casa, geral"},
+{"c":"02065","m":9.3,"d":"Ergômetro de escada (stair treadmill), geral"},
+{"c":"02068","m":11.0,"d":"Pular corda, geral"},
+{"c":"02069","m":9.0,"d":"Pular corda, Máquina Digi-Jump, 120 saltos/minuto"},
+{"c":"02070","m":7.3,"d":"Remo, ergômetro estacionário, geral, esforço vigoroso"},
+{"c":"02071","m":5.0,"d":"Remo, ergômetro estacionário, <100 watts, moderado"},
+{"c":"02072","m":7.5,"d":"Remo, estacionário, 100 a 149 watts, esforço vigoroso"},
+{"c":"02073","m":11.0,"d":"Remo, estacionário, 150 a 199 watts, esforço vigoroso"},
+{"c":"02074","m":14.0,"d":"Remo, estacionário, ≥ 200 watts, muito vigoroso"},
+{"c":"02078","m":11.0,"d":"Corrida shuttle (vaivém), para frente/trás/lateral"},
+{"c":"02080","m":6.8,"d":"Máquina de esqui, geral"},
+{"c":"02082","m":10.5,"d":"Ergômetro de esqui, cross country, polimento duplo, lento/moderado"},
+{"c":"02084","m":18.0,"d":"Ergômetro de esqui, cross country, polimento duplo, rápido/máximo"},
+{"c":"02085","m":10.5,"d":"Exercício em prancha deslizante (slide board), geral"},
+{"c":"02090","m":6.0,"d":"Slimnastics, jazzercise"},
+{"c":"02101","m":2.3,"d":"Alongamento, leve"},
+{"c":"02103","m":1.8,"d":"Pilates, tradicional, no solo (mat)"},
+{"c":"02105","m":2.8,"d":"Pilates, geral"},
+{"c":"02107","m":8.5,"d":"Pound, combinação de Pilates e movimentos com percussão"},
+{"c":"02108","m":4.5,"d":"Pole dancing, aula de exercício"},
+{"c":"02110","m":6.8,"d":"Ensinar aulas de exercícios (ex: aeróbica, hidroginástica)"},
+{"c":"02112","m":2.8,"d":"Bola de exercício terapêutica (Fitball)"},
+{"c":"02114","m":9.5,"d":"Bola de exercício terapêutica (Fitball), alta intensidade"},
+{"c":"02115","m":2.8,"d":"Ergômetro de braço, geral, leve"},
+{"c":"02116","m":2.0,"d":"Ergômetro de braço, hand bike, 15W"},
+{"c":"02117","m":2.8,"d":"Ergômetro de braço, hand bike, 25-30W"},
+{"c":"02118","m":3.5,"d":"Ergômetro de braço, hand bike, 45W"},
+{"c":"02119","m":4.3,"d":"Exercício de braço, bicicleta Airdyne (apenas braços), moderado"},
+{"c":"02120","m":5.3,"d":"Hidroginástica, calistenia aquática"},
+{"c":"02135","m":1.3,"d":"Hidromassagem, sentado"},
+{"c":"02140","m":2.5,"d":"Vídeo de exercícios (yoga, alongamento), esforço leve"},
+{"c":"02143","m":4.0,"d":"Vídeo de exercícios (cardio-resistência), moderado"},
+{"c":"02145","m":6.0,"d":"Vídeo de exercícios (cardio-resistência), vigoroso"},
+{"c":"02150","m":2.3,"d":"Yoga, Hatha"},
+{"c":"02153","m":8.0,"d":"Yoga, Hatha, alta intensidade"},
+{"c":"02155","m":3.0,"d":"Yoga, Hot (Quente)"},
+{"c":"02160","m":4.0,"d":"Yoga, Power"},
+{"c":"02170","m":2.0,"d":"Yoga, Nadisodhana"},
+{"c":"02175","m":2.3,"d":"Yoga, Geral"},
+{"c":"02180","m":3.5,"d":"Yoga, Surya Namaskar (Saudação ao Sol)"},
+{"c":"02185","m":2.7,"d":"Yoga, Vinyasa"},
+{"c":"02200","m":5.3,"d":"Atividades físicas nativas da N. Zelândia (Haka, Poi), moderado"},
+{"c":"02205","m":6.8,"d":"Atividades físicas nativas da N. Zelândia, vigoroso"},
+{"c":"02210","m":7.0,"d":"Exercício intervalado de alta intensidade, esforço moderado"},
+{"c":"02214","m":11.0,"d":"HIIT (burpees, mountain climbers, saltos), esforço vigoroso"},
+{"c":"02225","m":2.3,"d":"Robô BEAR, simulação de esqui, tênis, rodeio"},
+{"c":"02230","m":5.8,"d":"Bambolê (hooping)"},
+{"c":"02240","m":9.0,"d":"Sistema de Treinamento Impulse, Treinador Inercial"},
+{"c":"02280","m":7.9,"d":"VR Fitness, Supernatural™ 'Flow' ou 'Boxing', vigoroso"},
+{"c":"02284","m":9.3,"d":"ExerCube, série de treinos"},
+{"c":"02288","m":13.0,"d":"VR imersiva Blackbox, intensidade vigorosa"},
+{"c":"02300","m":3.0,"d":"Exercício com bastão, Life-Build-Line"},
+{"c":"02310","m":6.5,"d":"Zumba, aula em grupo"},
+{"c":"02315","m":5.5,"d":"Zumba, vídeo em casa"},
+{"c":"02340","m":2.8,"d":"Exercício de sentar e levantar, 6-12 vezes/min"},
+{"c":"02344","m":4.0,"d":"Exercício de sentar e levantar, 18-24 vezes/min"},
+{"c":"03005","m":6.0,"d":"Salsa afro-cubana (cha-cha-cha, mambo, rumba, etc.)"},
+{"c":"03010","m":5.0,"d":"Ballet, moderno ou jazz geral, ensaio ou aula"},
+{"c":"03011","m":6.3,"d":"Exercícios de ballet (plié, tendus, jetés, etc.)"},
+{"c":"03012","m":6.8,"d":"Ballet, moderno ou jazz, performance, vigoroso"},
+{"c":"03014","m":4.8,"d":"Sapateado (Tap)"},
+{"c":"03025","m":4.5,"d":"Dança étnica/cultural (grega, hula, salsa, merengue, etc.)"},
+{"c":"03028","m":5.5,"d":"Dança de praça chinesa, Ballet e Dança Tibetana"},
+{"c":"03029","m":7.3,"d":"Dança de praça chinesa, dança aeróbica"},
+{"c":"03030","m":5.5,"d":"Dança de salão, rápida"},
+{"c":"03031","m":9.8,"d":"Dança de discoteca, folclórica ou de linha, vigoroso"},
+{"c":"03033","m":5.0,"d":"Dança folclórica, esforço moderado"},
+{"c":"03038","m":11.3,"d":"Dança de salão, competitiva, geral"},
+{"c":"03039","m":13.0,"d":"Dança de salão, competição DanceSport"},
+{"c":"03040","m":3.0,"d":"Dança de salão, lenta (valsa, foxtrot, mambo, etc.)"},
+{"c":"03042","m":6.0,"d":"Dança de salão, recreativa (valsa, foxtrot, swing)"},
+{"c":"03050","m":5.5,"d":"Dança Anishinaabe Jingle, ritmo acelerado"},
+{"c":"03060","m":3.5,"d":"Dança caribenha (Abakua, Bongo, Ibo, etc.)"},
+{"c":"03070","m":3.8,"d":"Dança contemporânea, geral"},
+{"c":"03072","m":4.3,"d":"Dança contemporânea, boate (nightclub)"},
+{"c":"03075","m":8.5,"d":"Dança flamenca"},
+{"c":"03078","m":4.5,"d":"Jazz, geral"},
+{"c":"03080","m":10.3,"d":"Teatro Musical, canto e dança"},
+{"c":"03085","m":5.8,"d":"Dança polinésia, hula lenta, Maori haka, tonganesa"},
+{"c":"03086","m":7.0,"d":"Dança polinésia, hula rápida, Filipino Tinikling"},
+{"c":"03087","m":8.8,"d":"Dança polinésia, Samoan slap, taitiana"},
+{"c":"03090","m":4.8,"d":"Salsa, com parceiro"},
+{"c":"03091","m":6.3,"d":"Salsa, seguindo vídeo"},
+{"c":"03093","m":5.5,"d":"Dança quadrada (Square Dance), country americano"},
+{"c":"04001","m":3.5,"d":"Pesca, geral"},
+{"c":"04005","m":4.5,"d":"Pesca, caranguejos"},
+{"c":"04007","m":4.0,"d":"Pesca, pegar peixe com as mãos"},
+{"c":"04010","m":4.3,"d":"Cavar minhocas com pá"},
+{"c":"04020","m":4.0,"d":"Pescar na margem do rio e caminhando"},
+{"c":"04030","m":2.0,"d":"Pescar de barco ou canoa, sentado"},
+{"c":"04040","m":3.5,"d":"Pescar na margem do rio, em pé"},
+{"c":"04050","m":6.0,"d":"Pescar no riacho, com botas impermeáveis (waders)"},
+{"c":"04060","m":2.0,"d":"Pesca no gelo, sentado"},
+{"c":"04061","m":1.8,"d":"Pesca com linha, em pé, geral"},
+{"c":"04062","m":3.5,"d":"Pesca com rede de imersão, lançar e recuperar"},
+{"c":"04063","m":3.8,"d":"Pesca com rede fixa, lançar e recuperar"},
+{"c":"04064","m":3.0,"d":"Pesca com roda de pesca, geral"},
+{"c":"04065","m":2.3,"d":"Pesca com lança, em pé"},
+{"c":"04070","m":2.5,"d":"Caça com arco e flecha ou besta"},
+{"c":"04080","m":6.0,"d":"Caça de grandes animais (veado, alce)"},
+{"c":"04081","m":9.8,"d":"Caça de grandes animais, arrastando carcaça"},
+{"c":"04083","m":4.0,"d":"Caça de grandes animais marinhos"},
+{"c":"04085","m":2.5,"d":"Caça de grandes animais de plataforma elevada"},
+{"c":"04086","m":2.0,"d":"Caça de carro, avião ou barco"},
+{"c":"04090","m":2.5,"d":"Caça de patos, andando na água"},
+{"c":"04095","m":3.0,"d":"Caça de morcego frugívoro, esquilo"},
+{"c":"04100","m":5.0,"d":"Caça, geral"},
+{"c":"04110","m":6.0,"d":"Caça de perdizes ou tetrazes"},
+{"c":"04115","m":3.3,"d":"Caça de pássaros"},
+{"c":"04120","m":5.0,"d":"Caça de pequenos animais (coelho, esquilo)"},
+{"c":"04123","m":3.3,"d":"Caça de porcos selvagens"},
+{"c":"04124","m":2.0,"d":"Colocar armadilhas, geral"},
+{"c":"04125","m":9.5,"d":"Caminhada com equipamento de caça"},
+{"c":"04130","m":2.5,"d":"Tiro com pistola ou tiro ao prato, em pé"},
+{"c":"04140","m":2.3,"d":"Exercícios de tiro com rifle, deitado"},
+{"c":"04145","m":2.5,"d":"Exercícios de tiro com rifle, ajoelhado ou em pé"},
+{"c":"04150","m":2.8,"d":"Coleta (forrageamento), mochila de 0-9,9 kg"},
+{"c":"04152","m":3.0,"d":"Coleta (forrageamento), mochila de 10-15 kg"},
+{"c":"04160","m":1.0,"d":"Sentado em barco, passageiro"},
+{"c":"04164","m":1.5,"d":"Em pé em barco"},
+{"c":"04168","m":3.3,"d":"Atividades em barco, levantar e baixar itens"},
+{"c":"05010","m":3.3,"d":"Varrer carpetes ou pisos, geral"},
+{"c":"05011","m":2.3,"d":"Varrer, lento, esforço leve"},
+{"c":"05012","m":3.8,"d":"Varrer, rápido, esforço moderado"},
+{"c":"05020","m":3.5,"d":"Limpeza pesada (lavar carro, limpar garagem)"},
+{"c":"05021","m":3.5,"d":"Limpeza, passar pano, em pé, moderado"},
+{"c":"05022","m":3.3,"d":"Limpar janelas, geral"},
+{"c":"05023","m":2.5,"d":"Passar pano, em pé, esforço leve"},
+{"c":"05024","m":4.5,"d":"Polir pisos usando máquina elétrica, em pé"},
+{"c":"05025","m":2.8,"d":"Tarefas domésticas simultâneas, esforço leve"},
+{"c":"05026","m":3.3,"d":"Tarefas domésticas simultâneas, esforço moderado"},
+{"c":"05027","m":4.3,"d":"Tarefas domésticas simultâneas, esforço vigoroso"},
+{"c":"05030","m":3.3,"d":"Limpeza de casa ou cabana, geral, moderado"},
+{"c":"05032","m":2.5,"d":"Espanar ou polir móveis, geral"},
+{"c":"05035","m":3.3,"d":"Cozinhar, lavar louça, limpar cozinha, moderado"},
+{"c":"05040","m":2.5,"d":"Arrumar, trocar lençóis, tirar lixo, esforço leve"},
+{"c":"05041","m":2.0,"d":"Lavar louça, em pé ou geral"},
+{"c":"05042","m":2.0,"d":"Retirar louça da mesa, caminhando, leve"},
+{"c":"05043","m":3.0,"d":"Aspirar pó, geral, moderado"},
+{"c":"05044","m":3.0,"d":"Abate de animais pequenos"},
+{"c":"05045","m":6.0,"d":"Abate de animais grandes, esforço vigoroso"},
+{"c":"05046","m":2.3,"d":"Cortar e defumar peixe, secar carne ou peixe"},
+{"c":"05048","m":4.0,"d":"Curtimento de peles, geral"},
+{"c":"05049","m":3.5,"d":"Preparação de alimentos, esforço moderado"},
+{"c":"05050","m":2.0,"d":"Cozinhar, eletrodomésticos manuais, esforço leve"},
+{"c":"05051","m":2.3,"d":"Preparação de alimentos, caminhando"},
+{"c":"05052","m":2.3,"d":"Servir comida, arrumar/limpar mesa, em pé"},
+{"c":"05053","m":2.5,"d":"Alimentar animais domésticos"},
+{"c":"05054","m":3.5,"d":"Carregar compras caminhando, terreno plano"},
+{"c":"05055","m":2.5,"d":"Guardar compras, carregar pacotes"},
+{"c":"05056","m":5.3,"d":"Carregar compras escada acima"},
+{"c":"05057","m":3.0,"d":"Cozinhar em fogão externo"},
+{"c":"05060","m":3.3,"d":"Fazer compras com ou sem carrinho, carregar sacola"},
+{"c":"05065","m":2.3,"d":"Compras (não alimentos), em pé ou caminhando"},
+{"c":"05070","m":1.8,"d":"Passar roupa"},
+{"c":"05080","m":1.3,"d":"Tricotar, costurar à mão, embrulhar presentes, sentado"},
+{"c":"05082","m":2.8,"d":"Costurar com máquina"},
+{"c":"05090","m":2.3,"d":"Lavar, dobrar, pendurar roupas, em pé, leve"},
+{"c":"05091","m":2.0,"d":"Dobrar ou pendurar roupas, sentado"},
+{"c":"05092","m":4.0,"d":"Lavanderia, esforço moderado"},
+{"c":"05095","m":2.0,"d":"Guardar roupas, arrumar malas, caminhando"},
+{"c":"05100","m":3.0,"d":"Arrumar cama, trocar lençóis"},
+{"c":"05110","m":5.0,"d":"Produção de xarope de bordo (carregar baldes/madeira)"},
+{"c":"05120","m":5.8,"d":"Mover móveis, carregar caixas"},
+{"c":"05121","m":5.0,"d":"Mudança, levantar cargas leves"},
+{"c":"05125","m":4.8,"d":"Organizar um cômodo"},
+{"c":"05130","m":3.5,"d":"Esfregar chão/banheiro de joelhos, moderado"},
+{"c":"05131","m":2.0,"d":"Esfregar chão/banheiro de joelhos, leve"},
+{"c":"05132","m":6.5,"d":"Esfregar chão/banheiro de joelhos, vigoroso"},
+{"c":"05140","m":3.0,"d":"Varrer garagem, calçada ou quintal"},
+{"c":"05146","m":3.8,"d":"Embalar/desembalar caixas, carregar carro, moderado"},
+{"c":"05147","m":3.0,"d":"Guardar itens domésticos, caminhando, moderado"},
+{"c":"05148","m":2.0,"d":"Regar plantas"},
+{"c":"05149","m":2.5,"d":"Acender fogo em lareira/fogão interno"},
+{"c":"05150","m":9.0,"d":"Mover móveis ou caixas pesadas escada acima"},
+{"c":"05160","m":2.0,"d":"Abastecer carro, trocar lâmpada, tarefas leves em pé"},
+{"c":"05165","m":3.5,"d":"Preparar-se para sair (trancar portas), moderado"},
+{"c":"05170","m":2.3,"d":"Brincar com crianças, sentado, esforço leve"},
+{"c":"05171","m":2.8,"d":"Brincar com crianças, em pé, esforço leve"},
+{"c":"05175","m":3.5,"d":"Brincar com crianças, caminhar/correr, moderado"},
+{"c":"05180","m":5.8,"d":"Brincar com crianças, caminhar/correr, vigoroso"},
+{"c":"05181","m":3.0,"d":"Caminhar carregando criança (6,8 kg ou mais)"},
+{"c":"05182","m":2.5,"d":"Caminhar carregando criança (menos de 6,8 kg)"},
+{"c":"05183","m":2.0,"d":"Em pé, segurando criança"},
+{"c":"05184","m":2.5,"d":"Cuidado de bebês, geral"},
+{"c":"05185","m":2.0,"d":"Cuidado infantil: banho, vestir, alimentar, sentado/ajoelhado"},
+{"c":"05186","m":3.5,"d":"Cuidado infantil: banho, vestir, alimentar, em pé, leve"},
+{"c":"05188","m":1.5,"d":"Deitado com bebê"},
+{"c":"05189","m":2.0,"d":"Amamentar, sentado ou reclinado"},
+{"c":"05190","m":2.5,"d":"Sentado, brincar com animais, esforço leve"},
+{"c":"05191","m":2.8,"d":"Em pé, brincar com animais, esforço leve"},
+{"c":"05192","m":2.8,"d":"Caminhar/correr com animais, esforço leve"},
+{"c":"05193","m":4.0,"d":"Caminhar/correr com animais, esforço moderado"},
+{"c":"05194","m":5.0,"d":"Caminhar/correr com animais, esforço vigoroso"},
+{"c":"05195","m":3.5,"d":"Em pé, dar banho no cachorro"},
+{"c":"05197","m":2.3,"d":"Cuidado geral de animais domésticos"},
+{"c":"05200","m":3.0,"d":"Cuidado de idosos/deficientes: banho, vestir, mover da cama"},
+{"c":"05205","m":1.8,"d":"Cuidado de idosos/deficientes: alimentar, pentear cabelo"},
+{"c":"05300","m":1.3,"d":"Lavar as mãos"},
+{"c":"06010","m":3.0,"d":"Reparo de aviões"},
+{"c":"06020","m":4.0,"d":"Funilaria de automóveis"},
+{"c":"06030","m":3.3,"d":"Reparo de automóveis, esforço leve ou moderado"},
+{"c":"06040","m":3.0,"d":"Carpintaria, geral, oficina"},
+{"c":"06050","m":6.0,"d":"Carpintaria, fora de casa"},
+{"c":"06052","m":3.8,"d":"Carpintaria, fora de casa, construir cerca"},
+{"c":"06060","m":3.3,"d":"Acabamento de móveis, envernizar ou reformar"},
+{"c":"06070","m":6.0,"d":"Serrar madeira dura, aplainar e furar, moderado/vigoroso"},
+{"c":"06072","m":4.0,"d":"Reforma residencial, tarefas moderadas"},
+{"c":"06074","m":2.3,"d":"Reforma residencial, tarefas leves"},
+{"c":"06080","m":5.0,"d":"Calafetagem, cabana de madeira"},
+{"c":"06090","m":4.5,"d":"Calafetagem, exceto cabana de madeira"},
+{"c":"06100","m":5.0,"d":"Limpar calhas"},
+{"c":"06110","m":5.0,"d":"Escavar garagem"},
+{"c":"06120","m":5.0,"d":"Instalar janelas de proteção"},
+{"c":"06122","m":5.0,"d":"Instalar drywall dentro de casa"},
+{"c":"06124","m":3.0,"d":"Pregar pregos"},
+{"c":"06126","m":2.5,"d":"Reparo doméstico geral, leve"},
+{"c":"06127","m":4.5,"d":"Reparo doméstico geral, moderado"},
+{"c":"06128","m":6.0,"d":"Reparo doméstico geral, vigoroso"},
+{"c":"06130","m":4.5,"d":"Colocar ou remover carpete"},
+{"c":"06140","m":3.8,"d":"Colocar azulejo ou linóleo"},
+{"c":"06144","m":3.0,"d":"Consertar eletrodomésticos"},
+{"c":"06150","m":5.0,"d":"Pintar exterior da casa"},
+{"c":"06160","m":3.3,"d":"Pintar interior, papel de parede, raspar tinta"},
+{"c":"06165","m":4.5,"d":"Pintura (geral)"},
+{"c":"06167","m":3.0,"d":"Encanamento, geral"},
+{"c":"06170","m":3.0,"d":"Colocar/remover lona em veleiro"},
+{"c":"06180","m":6.0,"d":"Trabalho em telhado"},
+{"c":"06190","m":4.5,"d":"Lixar pisos com lixadeira elétrica"},
+{"c":"06200","m":4.5,"d":"Raspar e pintar barcos"},
+{"c":"06210","m":5.0,"d":"Espalhar terra com pá"},
+{"c":"06220","m":4.5,"d":"Lavar e encerar barcos ou aviões"},
+{"c":"06225","m":2.0,"d":"Lavar e encerar carro"},
+{"c":"06230","m":4.5,"d":"Lavar ou pintar cercas, moderado"},
+{"c":"06240","m":3.3,"d":"Fiação, emendas elétricas"},
+{"c":"07009","m":1.0,"d":"Deitado assistindo TV"},
+{"c":"07011","m":1.0,"d":"Deitado acordado, ouvindo música, sem ler/falar"},
+{"c":"07020","m":1.0,"d":"Sentado assistindo TV"},
+{"c":"07021","m":1.0,"d":"Sentado silenciosamente, geral"},
+{"c":"07022","m":1.5,"d":"Sentado inquieto, mexendo as mãos"},
+{"c":"07023","m":1.8,"d":"Sentado inquieto, mexendo os pés"},
+{"c":"07024","m":1.3,"d":"Sentado fumando"},
+{"c":"07025","m":1.5,"d":"Sentado ouvindo música ou no cinema"},
+{"c":"07026","m":1.3,"d":"Sentado à mesa, cabeça nas mãos"},
+{"c":"07030","m":1.0,"d":"Dormindo"},
+{"c":"07040","m":1.3,"d":"Em pé silenciosamente (na fila)"},
+{"c":"07041","m":1.5,"d":"Em pé inquieto"},
+{"c":"07045","m":1.3,"d":"Em pé assistindo TV"},
+{"c":"07050","m":1.5,"d":"Reclinado, escrevendo"},
+{"c":"07060","m":1.3,"d":"Reclinado, falando ao telefone"},
+{"c":"07070","m":1.3,"d":"Reclinado, lendo"},
+{"c":"07075","m":1.0,"d":"Meditando"},
+{"c":"08009","m":4.1,"d":"Carregar/empilhar madeira ou lumber, leve/moderado"},
+{"c":"08010","m":5.5,"d":"Carregar/empilhar madeira ou lumber, moderado"},
+{"c":"08019","m":4.5,"d":"Cortar lenha, rachar toras, moderado"},
+{"c":"08020","m":6.5,"d":"Cortar lenha, rachar toras, vigoroso"},
+{"c":"08025","m":3.5,"d":"Limpar mato leve, cuidar do jardim, moderado"},
+{"c":"08030","m":6.3,"d":"Limpar terreno, arrastar mato, vigoroso"},
+{"c":"08040","m":5.0,"d":"Cavar caixa de areia, palear areia"},
+{"c":"08045","m":3.5,"d":"Cavar, usar enxada, compostagem, leve/moderado"},
+{"c":"08050","m":5.0,"d":"Cavar, usar enxada, compostagem (geral)"},
+{"c":"08052","m":7.3,"d":"Cavar, usar enxada, compostagem, vigoroso"},
+{"c":"08055","m":2.8,"d":"Dirigir trator"},
+{"c":"08057","m":8.3,"d":"Derrubar árvores grandes"},
+{"c":"08058","m":5.3,"d":"Derrubar árvores pequenas/médias"},
+{"c":"08060","m":5.8,"d":"Jardinagem com ferramentas elétricas (motosserra)"},
+{"c":"08066","m":2.0,"d":"Jardinagem, geral"},
+{"c":"08070","m":4.0,"d":"Canais de irrigação, abrir/fechar comportas"},
+{"c":"08080","m":6.3,"d":"Assentar pedra britada ou cascalho"},
+{"c":"08090","m":5.0,"d":"Assentar grama (sod)"},
+{"c":"08095","m":5.5,"d":"Cortar grama, caminhando, moderado"},
+{"c":"08100","m":2.5,"d":"Cortar grama, trator pilotado"},
+{"c":"08110","m":6.0,"d":"Cortar grama, cortador manual, vigoroso"},
+{"c":"08120","m":5.0,"d":"Cortar grama caminhando, motorizado, vigoroso"},
+{"c":"08125","m":4.5,"d":"Cortar grama motorizado, leve/moderado"},
+{"c":"08130","m":2.5,"d":"Operar soprador de neve, caminhando"},
+{"c":"08135","m":2.6,"d":"Plantar mudas, envasar, leve"},
+{"c":"08140","m":4.3,"d":"Plantar mudas/arbustos, agachado, moderado"},
+{"c":"08145","m":4.3,"d":"Plantar horta, agachado, moderado"},
+{"c":"08150","m":4.5,"d":"Plantar árvores"},
+{"c":"08160","m":4.0,"d":"Rastelar gramado ou folhas, moderado"},
+{"c":"08165","m":4.0,"d":"Rastelar gramado (geral)"},
+{"c":"08170","m":4.0,"d":"Limpar neve do telhado com rastelo"},
+{"c":"08180","m":3.0,"d":"Pilotar soprador de neve"},
+{"c":"08190","m":4.0,"d":"Ensacar grama ou folhas"},
+{"c":"08192","m":5.5,"d":"Palear terra ou lama"},
+{"c":"08195","m":5.3,"d":"Palear neve à mão, moderado"},
+{"c":"08200","m":6.0,"d":"Palear neve à mão (geral)"},
+{"c":"08202","m":7.5,"d":"Palear neve à mão, vigoroso"},
+{"c":"08210","m":3.8,"d":"Podar árvores/arbustos, manual"},
+{"c":"08215","m":3.3,"d":"Podar motorizado, soprador de folhas, moderado"},
+{"c":"08220","m":3.0,"d":"Aplicar fertilizante/sementes, empurrando"},
+{"c":"08230","m":4.0,"d":"Regar jardim, em pé ou caminhando"},
+{"c":"08239","m":3.8,"d":"Capinar, cultivar jardim, leve/moderado"},
+{"c":"08240","m":4.5,"d":"Capinar, cultivar jardim, moderado"},
+{"c":"08241","m":5.0,"d":"Capinar usando enxada, moderado/vigoroso"},
+{"c":"08245","m":3.8,"d":"Jardinagem geral, moderado"},
+{"c":"08246","m":3.5,"d":"Colher frutas ou café de árvores, moderado"},
+{"c":"08248","m":4.5,"d":"Colheita comercial de frutas (subir escadas), vigoroso"},
+{"c":"08250","m":3.0,"d":"Arrumar o quintal, colher flores/vegetais"},
+{"c":"08251","m":3.0,"d":"Caminhar para buscar ferramentas de jardim"},
+{"c":"08255","m":4.8,"d":"Empurrar carrinho de mão ou jardim, geral"},
+{"c":"08256","m":6.0,"d":"Empurrar carrinho de mão pesado (até 150 kg)"},
+{"c":"08260","m":2.3,"d":"Trabalho no quintal geral, leve"},
+{"c":"08261","m":4.0,"d":"Trabalho no quintal geral, moderado"},
+{"c":"08262","m":6.0,"d":"Trabalho no quintal geral, vigoroso"},
+{"c":"09000","m":1.3,"d":"Jogar jogos de tabuleiro, sentado"},
+{"c":"09005","m":2.5,"d":"Jogar em cassino, em pé"},
+{"c":"09010","m":1.5,"d":"Jogar cartas, sentado"},
+{"c":"09013","m":1.5,"d":"Jogar xadrez, sentado"},
+{"c":"09015","m":1.5,"d":"Copiar ou arquivar documentos, em pé"},
+{"c":"09020","m":1.8,"d":"Desenhar, escrever, pintar, em pé"},
+{"c":"09025","m":1.0,"d":"Rir, sentado"},
+{"c":"09030","m":1.0,"d":"Sentado lendo livro ou jornal"},
+{"c":"09034","m":1.8,"d":"Digitar ou ler em bola de estabilidade"},
+{"c":"09036","m":2.0,"d":"Exercitar-se nos comerciais de TV"},
+{"c":"09040","m":1.3,"d":"Trabalho de mesa, digitar, sentado"},
+{"c":"09050","m":1.3,"d":"Em pé conversando (telefone/pessoalmente)"},
+{"c":"09055","m":1.3,"d":"Sentado conversando (telefone/pessoalmente)"},
+{"c":"09060","m":1.5,"d":"Estudar, ler ou escrever, sentado"},
+{"c":"09065","m":1.8,"d":"Sentado em sala de aula, anotações"},
+{"c":"09070","m":1.0,"d":"Ler em pé"},
+{"c":"09071","m":2.5,"d":"Ficar em pé (miscelânea)"},
+{"c":"09075","m":1.8,"d":"Artesanato, tecer, fiação, sentado, leve"},
+{"c":"09080","m":3.0,"d":"Artesanato, tecer, fiação, sentado, moderado"},
+{"c":"09085","m":2.5,"d":"Artesanato, escultura, tecer, em pé, leve"},
+{"c":"09090","m":3.3,"d":"Artesanato, escultura, tecer, em pé, moderado"},
+{"c":"09095","m":3.5,"d":"Artesanato, escultura, tecer, em pé, vigoroso"},
+{"c":"09100","m":1.5,"d":"Retiro familiar (relaxar, comer, falar)"},
+{"c":"09101","m":2.5,"d":"Retiro familiar (brincar com crianças)"},
+{"c":"09105","m":2.0,"d":"Viajar em veículo (turismo)"},
+{"c":"09106","m":3.5,"d":"Turismo caminhando"},
+{"c":"09110","m":2.5,"d":"Acampamento (caminhar, em pé, sentar), leve/moderado"},
+{"c":"09115","m":1.5,"d":"Espectador em evento esportivo, sentado"},
+{"c":"10010","m":1.8,"d":"Acordeão, sentado"},
+{"c":"10020","m":2.3,"d":"Violoncelo, sentado"},
+{"c":"10030","m":2.3,"d":"Reger orquestra, em pé"},
+{"c":"10035","m":2.5,"d":"Contrabaixo, em pé"},
+{"c":"10040","m":3.8,"d":"Tocar bateria, sentado"},
+{"c":"10045","m":3.0,"d":"Tocar bongo/conga, sentado, moderado"},
+{"c":"10048","m":8.3,"d":"Tocar bateria em show ao vivo"},
+{"c":"10050","m":2.0,"d":"Flauta, sentado"},
+{"c":"10060","m":1.8,"d":"Tocar trompa, em pé"},
+{"c":"10070","m":2.3,"d":"Piano, sentado"},
+{"c":"10074","m":2.0,"d":"Tocar instrumentos em geral"},
+{"c":"10077","m":2.0,"d":"Órgão, sentado"},
+{"c":"10080","m":3.5,"d":"Trombone, em pé"},
+{"c":"10090","m":2.5,"d":"Trompete, em pé"},
+{"c":"10100","m":2.5,"d":"Violino, sentado"},
+{"c":"10110","m":1.8,"d":"Instrumentos de sopro (madeiras), sentado"},
+{"c":"10115","m":1.8,"d":"Instrumentos de metal, sentado"},
+{"c":"10120","m":2.0,"d":"Violão (clássico/folk), sentado"},
+{"c":"10125","m":3.0,"d":"Guitarra em banda de rock, em pé"},
+{"c":"10130","m":4.0,"d":"Banda de marcha, malabares com bastão, moderado"},
+{"c":"10131","m":5.5,"d":"Banda de marcha tocando instrumento, rápido"},
+{"c":"10135","m":3.5,"d":"Banda de marcha, mestre de cerimônias"},
+{"c":"11000","m":2.0,"d":"Estação ativa, pedal desk/bola, leve"},
+{"c":"11001","m":3.5,"d":"Mesa com pedal (40 watts)"},
+{"c":"11002","m":5.3,"d":"Mesa com pedal (80 watts)"},
+{"c":"11003","m":2.0,"d":"Mesa com esteira, caminhada <1,6 km/h"},
+{"c":"11004","m":2.8,"d":"Mesa com esteira, caminhada 1,6-3,2 km/h"},
+{"c":"11006","m":3.0,"d":"Comissário(a) de bordo"},
+{"c":"11008","m":4.8,"d":"Colheita de maçãs"},
+{"c":"11010","m":4.0,"d":"Padaria, geral, moderado"},
+{"c":"11015","m":2.0,"d":"Padaria, leve"},
+{"c":"11020","m":2.3,"d":"Encadernação de livros"},
+{"c":"11030","m":6.0,"d":"Construir estrada, dirigir máquinas pesadas"},
+{"c":"11035","m":2.0,"d":"Construir estrada, controlar tráfego"},
+{"c":"11038","m":2.5,"d":"Carpintaria geral, leve"},
+{"c":"11040","m":4.3,"d":"Carpintaria geral, moderado"},
+{"c":"11042","m":7.0,"d":"Carpintaria geral, pesado/vigoroso"},
+{"c":"11050","m":8.0,"d":"Carregar cargas pesadas (tijolos/ferramentas)"},
+{"c":"11060","m":8.0,"d":"Carregar cargas (11-22 kg) escada acima"},
+{"c":"11070","m":4.0,"d":"Camareira de hotel (arrumar cama/banheiro)"},
+{"c":"11072","m":4.3,"d":"Aspirar pó em espaço comercial"},
+{"c":"11080","m":5.3,"d":"Mineração de carvão, perfurar rocha"},
+{"c":"11090","m":5.0,"d":"Mineração de carvão, montar suportes"},
+{"c":"11100","m":5.5,"d":"Mineração de carvão, geral"},
+{"c":"11110","m":6.3,"d":"Mineração de carvão, palear à mão"},
+{"c":"11115","m":2.5,"d":"Cozinheiro ou Chef"},
+{"c":"11120","m":4.0,"d":"Construção civil externa ou reforma"},
+{"c":"11124","m":2.3,"d":"Construção, dobrar vergalhão"},
+{"c":"11125","m":2.3,"d":"Limpeza de custódia, leve"},
+{"c":"11126","m":3.8,"d":"Limpeza de custódia (polir chão/mopping), moderado"},
+{"c":"11130","m":3.3,"d":"Trabalho elétrico (conectar fios/emendas)"},
+{"c":"11135","m":1.8,"d":"Engenheiro (mecânico/elétrico)"},
+{"c":"11145","m":7.8,"d":"Fazenda, vigoroso (limpar celeiro/enfardar feno)"},
+{"c":"11146","m":4.8,"d":"Fazenda, moderado (alimentar animais/colheita)"},
+{"c":"11147","m":2.0,"d":"Fazenda, leve (limpar galpões/preparar ração)"},
+{"c":"11170","m":2.8,"d":"Fazenda, dirigir trator/colheitadeira"},
+{"c":"11180","m":3.5,"d":"Alimentar animais pequenos (fazenda)"},
+{"c":"11190","m":4.3,"d":"Alimentar gado ou cavalos"},
+{"c":"11191","m":4.3,"d":"Transportar água para animais"},
+{"c":"11192","m":4.5,"d":"Cuidar de animais (tosquia/marcação/partos)"},
+{"c":"11195","m":3.8,"d":"Cultivo de arroz, moagem de grãos"},
+{"c":"11210","m":3.5,"d":"Ordenha manual, limpar baldes, moderado"},
+{"c":"11220","m":1.3,"d":"Ordenha mecânica, leve"},
+{"c":"11222","m":3.0,"d":"Ordenha mecanizada em sala moderna"},
+{"c":"11240","m":8.0,"d":"Bombeiro, geral"},
+{"c":"11244","m":6.8,"d":"Bombeiro, resgate em acidente automobilístico"},
+{"c":"11245","m":8.0,"d":"Bombeiro, subir escada com equipamento"},
+{"c":"11246","m":9.0,"d":"Bombeiro, arrastar mangueiras/quebrar paredes"},
+{"c":"11247","m":3.5,"d":"Pesca comercial, leve"},
+{"c":"11248","m":5.0,"d":"Pesca comercial, moderado"},
+{"c":"11250","m":17.5,"d":"Corte com machado (51 golpes/min), extremamente vigoroso"},
+{"c":"11260","m":5.0,"d":"Corte com machado (19 golpes/min), moderado"},
+{"c":"11262","m":8.0,"d":"Corte com machado (35 golpes/min), vigoroso"},
+{"c":"11264","m":5.0,"d":"Trabalho florestal moderado (serra elétrica/capina)"},
+{"c":"11266","m":8.5,"d":"Trabalho florestal vigoroso (derrubar árvores/carregar toras)"},
+{"c":"11370","m":4.8,"d":"Peleteria (Furriery)"},
+{"c":"11375","m":3.8,"d":"Gari (coletor de lixo), caminhando/despejando bins"},
+{"c":"11378","m":1.8,"d":"Cabeleireiro(a), manicure ou maquiador(a)"},
+{"c":"11380","m":7.3,"d":"Cuidar de cavalos (banho/escova/exercício)"},
+{"c":"11381","m":4.3,"d":"Alimentar cavalos/limpar baias"},
+{"c":"11383","m":4.5,"d":"Trabalho a cavalo (conduzir gado)"},
+{"c":"11390","m":7.8,"d":"Corrida de cavalos (galope)"},
+{"c":"11400","m":6.3,"d":"Jóquei (trote)"},
+{"c":"11410","m":2.3,"d":"Jóquei (caminhada)"},
+{"c":"11413","m":3.0,"d":"Copeira/ajudante de cozinha"},
+{"c":"11415","m":4.0,"d":"Jardineiro, geral"},
+{"c":"11416","m":3.0,"d":"Podador de grama motorizado"},
+{"c":"11418","m":3.3,"d":"Trabalhador de lavanderia"},
+{"c":"11420","m":3.0,"d":"Chaveiro"},
+{"c":"11430","m":3.0,"d":"Usinagem/metalurgia leve/moderada"},
+{"c":"11450","m":5.0,"d":"Usinagem (prensa), moderado"},
+{"c":"11472","m":1.8,"d":"Gerente de propriedades"},
+{"c":"11475","m":2.8,"d":"Trabalho manual não qualificado, leve"},
+{"c":"11476","m":4.5,"d":"Trabalho manual não qualificado, moderado"},
+{"c":"11477","m":6.5,"d":"Trabalho manual não qualificado, vigoroso"},
+{"c":"11480","m":4.3,"d":"Alvenaria/concreto, moderado"},
+{"c":"11482","m":2.5,"d":"Alvenaria/concreto, leve"},
+{"c":"11485","m":5.5,"d":"Massoterapeuta (em pé)"},
+{"c":"11486","m":2.3,"d":"Carteiro caminhando"},
+{"c":"11487","m":1.5,"d":"Entrega de correio (moto)"},
+{"c":"11488","m":3.5,"d":"Entrega de correio (E-bike)"},
+{"c":"11490","m":7.5,"d":"Mover objetos pesados (>34 kg)"},
+{"c":"11493","m":8.5,"d":"Mineração (perfuração/instalação tubos)"},
+{"c":"11495","m":12.0,"d":"Mergulho profissional (Marinha/Navy Seal)"},
+{"c":"11500","m":2.5,"d":"Operar máquinas pesadas automatizadas"},
+{"c":"11510","m":3.5,"d":"Colheita comercial de laranjas"},
+{"c":"11514","m":3.3,"d":"Pintar casas/móveis, moderado"},
+{"c":"11516","m":3.0,"d":"Encanador (atividades)"},
+{"c":"11520","m":2.0,"d":"Indústria gráfica/papel (em pé)"},
+{"c":"11524","m":3.8,"d":"Policial caminhando"},
+{"c":"11525","m":2.5,"d":"Policial dirigindo trânsito"},
+{"c":"11526","m":2.0,"d":"Policial dirigindo viatura"},
+{"c":"11527","m":1.3,"d":"Policial passageiro em viatura"},
+{"c":"11528","m":4.0,"d":"Policial realizando prisão"},
+{"c":"11529","m":9.0,"d":"Manobras táticas (vasculhar prédio)"},
+{"c":"11530","m":2.0,"d":"Sapateiro, geral"},
+{"c":"11540","m":7.3,"d":"Palear/cavar valas"},
+{"c":"11550","m":8.8,"d":"Palear (>7 kg/min), escavação profunda"},
+{"c":"11560","m":5.0,"d":"Palear (<4,5 kg/min), moderado"},
+{"c":"11570","m":6.5,"d":"Palear (4,5-6,8 kg/min), vigoroso"},
+{"c":"11580","m":1.5,"d":"Tarefas sentadas leves (escritório/reparo leve)"},
+{"c":"11582","m":1.3,"d":"Trabalho no computador, sentado"},
+{"c":"11583","m":1.3,"d":"Estação de trabalho em pé (computador)"},
+{"c":"11585","m":1.3,"d":"Reuniões sentadas com conversa"},
+{"c":"11590","m":2.5,"d":"Operar guindaste/máquinas sentadas, moderado"},
+{"c":"11593","m":2.8,"d":"Ensinar alongamento/yoga, sentado"},
+{"c":"11600","m":1.8,"d":"Tarefas em pé leves (balconista/bibliotecário)"},
+{"c":"11610","m":3.3,"d":"Em pé (enfermagem/estoque/montagem), moderado"},
+{"c":"11615","m":4.5,"d":"Levantar 4,5-9 kg continuamente, moderado"},
+{"c":"11620","m":3.8,"d":"Levantar 22,7 kg intermitente, moderado"},
+{"c":"11630","m":4.5,"d":"Levantar >22,7 kg em pé (pintura/masonry)"},
+{"c":"11650","m":2.3,"d":"Atividades de saúde/cuidado de pacientes"},
+{"c":"11660","m":3.5,"d":"Limpeza de quartos em hospitais"},
+{"c":"11708","m":5.3,"d":"Siderurgia, moderado"},
+{"c":"11710","m":8.3,"d":"Siderurgia (laminação manual/forno), vigoroso"},
+{"c":"11720","m":2.3,"d":"Alfaiate (cortar tecido)"},
+{"c":"11730","m":2.5,"d":"Alfaiate, geral"},
+{"c":"11740","m":1.8,"d":"Alfaiate (costura à mão)"},
+{"c":"11750","m":2.5,"d":"Alfaiate (máquina de costura)"},
+{"c":"11760","m":3.5,"d":"Alfaiate (passar roupa)"},
+{"c":"11763","m":2.0,"d":"Tecelagem/tingimento leve"},
+{"c":"11765","m":4.0,"d":"Tecelagem/fiação moderada"},
+{"c":"11766","m":6.5,"d":"Carga/descarga de caminhão e amarração de carga"},
+{"c":"11767","m":2.0,"d":"Dirigir táxi/ônibus/caminhão de entrega"},
+{"c":"11770","m":1.3,"d":"Digitação elétrica/manual"},
+{"c":"11780","m":6.3,"d":"Usar ferramentas elétricas pesadas (britadeiras)"},
+{"c":"11790","m":7.8,"d":"Usar ferramentas manuais pesadas (picareta)"},
+{"c":"11791","m":2.0,"d":"Caminhada no escritório <3,2 km/h"},
+{"c":"11792","m":3.8,"d":"Caminhada no escritório 4,5-5,5 km/h"},
+{"c":"11793","m":4.8,"d":"Caminhada no escritório 5,6-6,3 km/h"},
+{"c":"11795","m":3.5,"d":"Caminhar 4 km/h carregando <11,3 kg"},
+{"c":"11796","m":3.0,"d":"Caminhar reunindo coisas para sair"},
+{"c":"11800","m":4.5,"d":"Caminhar 4,8 km/h carregando <11,3 kg"},
+{"c":"11805","m":3.8,"d":"Caminhar empurrando cadeira de rodas"},
+{"c":"11810","m":4.5,"d":"Caminhar 5,6 km/h carregando <11,3 kg"},
+{"c":"11820","m":4.0,"d":"Carregar 11,3-22,2 kg (caminhar/em pé)"},
+{"c":"11830","m":5.5,"d":"Carregar 22,7-33,6 kg (caminhar/em pé)"},
+{"c":"11840","m":7.0,"d":"Carregar 34-45 kg (caminhar/em pé)"},
+{"c":"11850","m":7.3,"d":"Carregar >45 kg (caminhar/em pé)"},
+{"c":"11860","m":2.3,"d":"Carga/descarga de caixas (armazém)"},
+{"c":"11862","m":4.3,"d":"Mover caixas de ~5 kg (armazém)"},
+{"c":"11870","m":3.0,"d":"Trabalhador de teatro (bastidores/cenário)"},
+{"c":"11880","m":3.5,"d":"Soldado, marcha sem carga 2,4-4,0 km/h"},
+{"c":"11882","m":4.0,"d":"Soldado, marcha com 10-30 kg, 2,4-4,0 km/h"},
+{"c":"11884","m":5.0,"d":"Trote Airborne, 4-5,6 km/h, 20-30 kg"},
+{"c":"11886","m":6.3,"d":"Soldado, marcha com 25-40 kg, terreno variado"},
+{"c":"11887","m":6.0,"d":"Soldado, caminhada 4,5 km/h, 5% inclinação, 21,5 kg"},
+{"c":"11888","m":8.5,"d":"Soldado, caminhada 4,5 km/h, 10% inclinação, 21,5 kg"},
+{"c":"11889","m":11.0,"d":"Soldado, caminhada 4,5 km/h, 15% inclinação, 21,5 kg"},
+{"c":"11892","m":6.0,"d":"Atividade militar, cavar posições defensivas"},
+{"c":"12010","m":6.0,"d":"Combinação corrida/caminhada (corrida <10 min)"},
+{"c":"12020","m":7.5,"d":"Trote (jogging), geral, ritmo próprio"},
+{"c":"12025","m":4.8,"d":"Corrida no lugar"},
+{"c":"12026","m":3.3,"d":"Corrida leve 4,2-6,0 km/h"},
+{"c":"12027","m":4.5,"d":"Corrida em mini cama elástica"},
+{"c":"12028","m":6.5,"d":"Corrida, 6,4-6,8 km/h"},
+{"c":"12029","m":7.8,"d":"Corrida, 6,9-7,7 km/h"},
+{"c":"12030","m":8.5,"d":"Corrida, 8,0-8,4 km/h"},
+{"c":"12045","m":9.0,"d":"Corrida, 8,8-9,3 km/h"},
+{"c":"12050","m":9.3,"d":"Corrida, 9,6-10,1 km/h"},
+{"c":"12060","m":10.5,"d":"Corrida, 10,8 km/h"},
+{"c":"12070","m":11.0,"d":"Corrida, 11,3 km/h"},
+{"c":"12080","m":11.8,"d":"Corrida, 12,1 km/h"},
+{"c":"12090","m":12.0,"d":"Corrida, 12,9 km/h"},
+{"c":"12100","m":12.5,"d":"Corrida, 13,8 km/h"},
+{"c":"12110","m":13.0,"d":"Corrida, 14,5 km/h"},
+{"c":"12115","m":14.8,"d":"Corrida, 15,0-15,4 km/h"},
+{"c":"12120","m":14.8,"d":"Corrida, 16,1 km/h"},
+{"c":"12130","m":16.8,"d":"Corrida, 17,7 km/h"},
+{"c":"12132","m":18.5,"d":"Corrida, 19,3 km/h"},
+{"c":"12134","m":19.8,"d":"Corrida, 20,9 km/h"},
+{"c":"12135","m":23.0,"d":"Corrida, 22,5 km/h"},
+{"c":"12140","m":9.3,"d":"Corrida cross country"},
+{"c":"12145","m":10.5,"d":"Corrida em ritmo selecionado pelo próprio"},
+{"c":"12150","m":8.0,"d":"Corrida (Taylor Code 200)"},
+{"c":"12170","m":15.0,"d":"Subir escadas correndo"},
+{"c":"12180","m":10.0,"d":"Treino de corrida em pista, equipe"},
+{"c":"12184","m":18.0,"d":"Corrida em pista competitiva (500-1500m)"},
+{"c":"12186","m":19.3,"d":"Corrida em pista competitiva (2000-3000m)"},
+{"c":"12190","m":8.0,"d":"Correr empurrando cadeira de rodas ou carrinho"},
+{"c":"12200","m":13.3,"d":"Corrida de maratona"},
+{"c":"12255","m":10.3,"d":"Correr em subida (5% inclinação, 7,2 km/h)"},
+{"c":"12260","m":13.3,"d":"Correr em subida (5% inclinação, 9,6 km/h)"},
+{"c":"12265","m":15.5,"d":"Correr em subida (5% inclinação, 11,3 km/h)"},
+{"c":"12325","m":17.5,"d":"Correr em subida (15% inclinação, 8-9,5 km/h)"},
+{"c":"12335","m":8.8,"d":"Correr em subida (30% inclinação, 1 km/h)"},
+{"c":"12337","m":10.3,"d":"Correr em subida (30% inclinação, 1,3-1,6 km/h)"},
+{"c":"12339","m":11.8,"d":"Correr em subida (30% inclinação, 1,6-1,9 km/h)"},
+{"c":"12341","m":13.5,"d":"Correr em subida (30-40% inclinação, 2 km/h)"},
+{"c":"12343","m":14.8,"d":"Correr em subida (30% inclinação, 2,3-2,5 km/h)"},
+{"c":"12345","m":16.3,"d":"Correr em subida (>2,5 km/h, 10-30% inclinação)"},
+{"c":"12350","m":16.0,"d":"Correr em terreno acidentado (±100m elevação)"},
+{"c":"12352","m":5.8,"d":"Correr em descida (-10% a -15%, 8-9,5 km/h)"},
+{"c":"12353","m":7.5,"d":"Correr em descida (-10% a -15%, 9,6-11,1 km/h)"},
+{"c":"12355","m":9.0,"d":"Correr em descida (-10% a -15%, 11,3-14,3 km/h)"},
+{"c":"12358","m":9.3,"d":"Correr em descida (-3% a -9%, 9,6-12,7 km/h)"},
+{"c":"12361","m":13.8,"d":"Correr em descida (-3% a -9%, 12,9-16,9 km/h)"},
+{"c":"12405","m":5.3,"d":"Correr em esteira curva (4,8-6,3 km/h)"},
+{"c":"12408","m":6.5,"d":"Correr em esteira curva (6,4-7,9 km/h)"},
+{"c":"12410","m":11.0,"d":"Correr em esteira curva (8,0-9,5 km/h)"},
+{"c":"12412","m":12.0,"d":"Correr em esteira curva (11,3-12,7 km/h)"},
+{"c":"12414","m":14.0,"d":"Correr em esteira curva (12,9-14,3 km/h)"},
+{"c":"12416","m":16.8,"d":"Correr em esteira curva (14,5-15,9 km/h)"},
+{"c":"12508","m":8.5,"d":"Correr com mochila 1-3 kg (8-9,5 km/h)"},
+{"c":"12510","m":9.5,"d":"Correr com mochila 1-3 kg (9,6-11,1 km/h)"},
+{"c":"12512","m":9.8,"d":"Correr com mochila 1-3 kg (11,3-12,7 km/h)"},
+{"c":"12514","m":12.0,"d":"Correr com mochila 1-3 kg (12,9-14,3 km/h)"},
+{"c":"12555","m":7.8,"d":"Correr descalço (5,6-9,5 km/h)"},
+{"c":"12560","m":12.0,"d":"Correr descalço (9,6-12,7 km/h)"},
+{"c":"12565","m":13.5,"d":"Correr descalço (12,9-14,3 km/h)"},
+{"c":"12585","m":8.0,"d":"Correr com carrinho (interno, 8 km/h)"},
+{"c":"12588","m":9.0,"d":"Correr com carrinho (interno, 9,6 km/h)"},
+{"c":"12593","m":10.0,"d":"Correr com carrinho (externo, 8 km/h)"},
+{"c":"12595","m":11.5,"d":"Correr com carrinho (externo, 9,6 km/h)"},
+{"c":"12600","m":11.5,"d":"Saltitar (skipping) 8,8-9,6 km/h"},
+{"c":"12620","m":13.0,"d":"Triatlo, etapa de corrida"},
+{"c":"13000","m":2.3,"d":"Higiene pessoal: preparar-se para dormir (em pé)"},
+{"c":"13009","m":2.3,"d":"Eliminação (sentado ou em pé)"},
+{"c":"13010","m":1.5,"d":"Banhar-se sentado"},
+{"c":"13020","m":2.8,"d":"Vestir ou despir-se (em pé ou sentado)"},
+{"c":"13030","m":1.5,"d":"Comer sentado"},
+{"c":"13035","m":2.0,"d":"Comer em pé"},
+{"c":"13036","m":1.5,"d":"Tomar medicação (sentado ou em pé)"},
+{"c":"13040","m":2.0,"d":"Grooming (barbear/escovar dentes/maquiagem)"},
+{"c":"13045","m":2.5,"d":"Arrumar o cabelo (em pé)"},
+{"c":"13046","m":1.3,"d":"Ter cabelo ou unhas feitos por outro"},
+{"c":"13050","m":2.0,"d":"Banho de chuveiro e secar-se"},
+{"c":"14010","m":5.8,"d":"Atividade sexual ativa, esforço vigoroso"},
+{"c":"14020","m":3.0,"d":"Atividade sexual geral, esforço moderado"},
+{"c":"14030","m":1.8,"d":"Atividade sexual passiva (beijos/abraços)"},
+{"c":"15000","m":5.5,"d":"Jogos Nativos do Alasca/Olimpíadas Esquimós"},
+{"c":"15010","m":4.3,"d":"Tiro com arco (recreativo)"},
+{"c":"15020","m":7.0,"d":"Badminton competitivo"},
+{"c":"15025","m":9.0,"d":"Badminton competitivo, partida"},
+{"c":"15030","m":5.5,"d":"Badminton social"},
+{"c":"15040","m":8.0,"d":"Basquete, jogo"},
+{"c":"15050","m":6.0,"d":"Basquete geral (não-jogo)"},
+{"c":"15055","m":7.5,"d":"Basquete (atividades gerais)"},
+{"c":"15060","m":7.0,"d":"Basquete, arbitragem"},
+{"c":"15062","m":5.8,"d":"Basquete, arbitragem (esforço moderado)"},
+{"c":"15070","m":5.0,"d":"Basquete, arremessos à cesta"},
+{"c":"15072","m":9.3,"d":"Basquete, prática e treinos táticos"},
+{"c":"15080","m":2.5,"d":"Bilhar"},
+{"c":"15090","m":3.0,"d":"Boliche"},
+{"c":"15092","m":3.8,"d":"Boliche em pista interna"},
+{"c":"15100","m":12.3,"d":"Boxe, no ringue"},
+{"c":"15110","m":5.8,"d":"Boxe, saco de pancadas"},
+{"c":"15113","m":7.0,"d":"Boxe, saco de pancadas (60 golpes/min)"},
+{"c":"15115","m":8.5,"d":"Boxe, saco de pancadas (120 golpes/min)"},
+{"c":"15118","m":10.8,"d":"Boxe, saco de pancadas (180 golpes/min)"},
+{"c":"15120","m":7.8,"d":"Boxe, sparring"},
+{"c":"15125","m":9.3,"d":"Boxe simulado como exercício"},
+{"c":"15130","m":7.0,"d":"Broomball"},
+{"c":"15135","m":5.8,"d":"Jogos infantis (queimada/amarelinha), adultos brincando"},
+{"c":"15138","m":6.0,"d":"Cheerleading competitivo"},
+{"c":"15140","m":4.0,"d":"Treinar esportes (coaching)"},
+{"c":"15142","m":8.0,"d":"Treinar jogando ativamente com os atletas"},
+{"c":"15150","m":4.8,"d":"Críquete (batting/bowling/fielding)"},
+{"c":"15160","m":3.3,"d":"Croquet"},
+{"c":"15170","m":4.0,"d":"Curling"},
+{"c":"15180","m":2.5,"d":"Dardos"},
+{"c":"15190","m":6.0,"d":"Drag racing (empurrar/dirigir carro)"},
+{"c":"15192","m":8.5,"d":"Auto racing (fórmula)"},
+{"c":"15195","m":7.8,"d":"Futsal"},
+{"c":"15200","m":6.0,"d":"Esgrima geral"},
+{"c":"15203","m":9.8,"d":"Esgrima competitiva (espada)"},
+{"c":"15205","m":10.5,"d":"Floorball"},
+{"c":"15210","m":8.0,"d":"Futebol Americano competitivo"},
+{"c":"15230","m":8.0,"d":"Futebol Americano flag/touch"},
+{"c":"15232","m":4.0,"d":"Futebol Americano flag/touch (leve)"},
+{"c":"15235","m":2.5,"d":"Brincar de pegar bola (beisebol/futebol)"},
+{"c":"15240","m":3.0,"d":"Brincar de Frisbee"},
+{"c":"15250","m":8.0,"d":"Ultimate Frisbee"},
+{"c":"15252","m":3.8,"d":"Frisbee golf"},
+{"c":"15255","m":4.5,"d":"Golfe geral"},
+{"c":"15265","m":4.3,"d":"Golfe, caminhando e carregando tacos"},
+{"c":"15270","m":3.5,"d":"Mini golfe ou driving range"},
+{"c":"15285","m":4.5,"d":"Golfe, caminhando e puxando tacos"},
+{"c":"15290","m":3.5,"d":"Golfe com carrinho motorizado"},
+{"c":"15300","m":3.8,"d":"Ginástica geral"},
+{"c":"15310","m":4.0,"d":"Hacky sack"},
+{"c":"15320","m":12.0,"d":"Handebol geral"},
+{"c":"15330","m":8.0,"d":"Handebol de equipe"},
+{"c":"15335","m":4.0,"d":"Arvorismo (high ropes course)"},
+{"c":"15340","m":3.5,"d":"Asa-delta"},
+{"c":"15350","m":7.8,"d":"Hóquei sobre grama"},
+{"c":"15360","m":8.0,"d":"Hóquei no gelo geral"},
+{"c":"15362","m":10.0,"d":"Hóquei no gelo competitivo"},
+{"c":"15370","m":5.5,"d":"Equitação geral"},
+{"c":"15380","m":4.5,"d":"Cuidar/selar cavalos"},
+{"c":"15390","m":5.8,"d":"Equitação (trote)"},
+{"c":"15395","m":7.3,"d":"Equitação (galope)"},
+{"c":"15400","m":3.8,"d":"Equitação (caminhada)"},
+{"c":"15402","m":9.0,"d":"Equitação (saltos)"},
+{"c":"15403","m":6.0,"d":"Equitação (reining)"},
+{"c":"15406","m":2.1,"d":"Simulador de equitação"},
+{"c":"15408","m":1.8,"d":"Dirigir charrete"},
+{"c":"15410","m":3.0,"d":"Jogo de ferraduras"},
+{"c":"15420","m":12.0,"d":"Jai alai"},
+{"c":"15425","m":5.3,"d":"Artes marciais (prática lenta/novatos)"},
+{"c":"15430","m":10.3,"d":"Artes marciais (judô/caratê/taekwondo), moderado"},
+{"c":"15432","m":14.3,"d":"Taekwondo (combate simulado)"},
+{"c":"15433","m":11.3,"d":"Judô"},
+{"c":"15440","m":4.0,"d":"Malabarismo"},
+{"c":"15444","m":6.5,"d":"Kendo (kihon-keiko), moderado"},
+{"c":"15445","m":9.6,"d":"Kendo (kirikaeshi), alto"},
+{"c":"15446","m":11.3,"d":"Kendo (kakari keiko), muito alto"},
+{"c":"15450","m":7.0,"d":"Kickball"},
+{"c":"15455","m":5.5,"d":"Ginástica Kung Fu"},
+{"c":"15457","m":7.3,"d":"Kickboxing"},
+{"c":"15460","m":8.0,"d":"Lacrosse"},
+{"c":"15465","m":3.3,"d":"Bocha (bocce) ao ar livre"},
+{"c":"15470","m":4.0,"d":"Motocross ou quadriciclo (ATV)"},
+{"c":"15475","m":5.3,"d":"Corrida de moto (Supermoto)"},
+{"c":"15477","m":7.0,"d":"Netball"},
+{"c":"15480","m":9.0,"d":"Corrida de orientação"},
+{"c":"15490","m":10.0,"d":"Paddleball competitivo"},
+{"c":"15500","m":6.0,"d":"Paddleball casual"},
+{"c":"15503","m":1.8,"d":"Paragliding"},
+{"c":"15506","m":6.5,"d":"Escalada com nós (Prusik climbing)"},
+{"c":"15510","m":8.0,"d":"Polo a cavalo"},
+{"c":"15520","m":10.0,"d":"Raquetebol competitivo"},
+{"c":"15525","m":10.3,"d":"Marcha atlética (11,1 km/h)"},
+{"c":"15527","m":13.8,"d":"Marcha atlética (13,3 km/h)"},
+{"c":"15528","m":15.5,"d":"Marcha atlética em velocidade de corrida (14,4 km/h)"},
+{"c":"15530","m":7.0,"d":"Raquetebol geral"},
+{"c":"15533","m":8.0,"d":"Escalada em rocha ou montanhismo"},
+{"c":"15534","m":8.8,"d":"Escalada (bouldering)"},
+{"c":"15535","m":7.3,"d":"Escalada em rocha de alta dificuldade"},
+{"c":"15536","m":10.5,"d":"Escalada de velocidade, muito difícil"},
+{"c":"15537","m":5.8,"d":"Escalada de dificuldade baixa/moderada"},
+{"c":"15538","m":10.5,"d":"Escalada em esteira (treadwall, 4-6 m/min)"},
+{"c":"15539","m":10.5,"d":"Escalada em esteira (treadwall, 7-10 m/min)"},
+{"c":"15540","m":5.0,"d":"Rapel"},
+{"c":"15542","m":4.0,"d":"Esportes de rodeio, leve"},
+{"c":"15544","m":5.5,"d":"Esportes de rodeio, moderado"},
+{"c":"15546","m":7.0,"d":"Esportes de rodeio, vigoroso"},
+{"c":"15550","m":12.3,"d":"Pular corda rápido (120-160 saltos/min)"},
+{"c":"15551","m":11.8,"d":"Pular corda moderado (100-120 saltos/min)"},
+{"c":"15552","m":8.3,"d":"Pular corda lento (<100 saltos/min)"},
+{"c":"15554","m":10.0,"d":"Pular corda (double under)"},
+{"c":"15560","m":8.3,"d":"Rugby competitivo"},
+{"c":"15562","m":6.3,"d":"Rugby touch (não competitivo)"},
+{"c":"15570","m":3.0,"d":"Shuffleboard"},
+{"c":"15580","m":5.0,"d":"Skateboarding geral"},
+{"c":"15582","m":6.0,"d":"Skateboarding competitivo"},
+{"c":"15590","m":7.0,"d":"Patinação de rodas (roller skating)"},
+{"c":"15591","m":7.5,"d":"Patinação in-line recreativa (14,4 km/h)"},
+{"c":"15592","m":9.8,"d":"Patinação in-line moderada (17,7 km/h)"},
+{"c":"15593","m":12.3,"d":"Patinação in-line rápida (21 km/h)"},
+{"c":"15594","m":15.5,"d":"Patinação in-line, esforço máximo (24 km/h)"},
+{"c":"15595","m":6.8,"d":"Skate longboard (13,3 km/h)"},
+{"c":"15596","m":8.3,"d":"Skate longboard (16,2 km/h)"},
+{"c":"15597","m":10.5,"d":"Skate longboard (18,4 km/h)"},
+{"c":"15600","m":3.5,"d":"Paraquedismo/Bungee jumping"},
+{"c":"15605","m":9.5,"d":"Futebol competitivo"},
+{"c":"15610","m":7.0,"d":"Futebol casual"},
+{"c":"15615","m":3.5,"d":"Futebol caminhando (walking football)"},
+{"c":"15620","m":5.0,"d":"Softball/Beisebol geral"},
+{"c":"15625","m":4.0,"d":"Softball (prática)"},
+{"c":"15630","m":4.0,"d":"Softball (arbitragem)"},
+{"c":"15640","m":6.0,"d":"Softball (pitching)"},
+{"c":"15645","m":3.3,"d":"Espectador animado/movimentando-se"},
+{"c":"15650","m":12.0,"d":"Squash (competitivo)"},
+{"c":"15652","m":7.3,"d":"Squash geral"},
+{"c":"15660","m":4.0,"d":"Tênis de mesa"},
+{"c":"15670","m":3.3,"d":"Tai chi ou Qi gong geral"},
+{"c":"15672","m":1.5,"d":"Tai chi ou Qi gong sentado"},
+{"c":"15674","m":6.0,"d":"Tai chi chuan (estilo Yang)"},
+{"c":"15675","m":6.8,"d":"Tênis moderado"},
+{"c":"15676","m":8.0,"d":"Tênis competitivo"},
+{"c":"15680","m":6.0,"d":"Tênis em duplas"},
+{"c":"15685","m":4.5,"d":"Tênis em duplas (lazer)"},
+{"c":"15690","m":8.0,"d":"Tênis em simples"},
+{"c":"15695","m":5.0,"d":"Tênis (treino de batidas)"},
+{"c":"15700","m":6.3,"d":"Cama elástica recreativa"},
+{"c":"15702","m":10.3,"d":"Cama elástica competitiva"},
+{"c":"15710","m":4.0,"d":"Voleibol geral"},
+{"c":"15711","m":6.0,"d":"Voleibol competitivo em ginásio"},
+{"c":"15720","m":3.0,"d":"Voleibol não-competitivo (6-9 jogadores)"},
+{"c":"15725","m":8.0,"d":"Voleibol de praia"},
+{"c":"15730","m":6.0,"d":"Luta livre (wrestling) competitiva"},
+{"c":"15731","m":7.0,"d":"Wallyball"},
+{"c":"15732","m":4.0,"d":"Atletismo (arremessos)"},
+{"c":"15733","m":6.0,"d":"Atletismo (saltos/vara/dardo)"},
+{"c":"15734","m":10.0,"d":"Atletismo (obstáculos/steeplechase)"},
+{"c":"16002","m":6.8,"d":"Ciclismo para transporte, moderado"},
+{"c":"16004","m":9.3,"d":"Ciclismo para transporte, alto esforço"},
+{"c":"16005","m":6.8,"d":"E-bike para transporte"},
+{"c":"16010","m":2.0,"d":"Dirigir carro ou caminhonete"},
+{"c":"16015","m":1.3,"d":"Andar de carro ou caminhonete (passageiro)"},
+{"c":"16016","m":1.3,"d":"Andar de ônibus ou trem (passageiro)"},
+{"c":"16020","m":1.8,"d":"Pilotar avião ou helicóptero"},
+{"c":"16030","m":2.8,"d":"Dirigir moto ou scooter"},
+{"c":"16035","m":6.3,"d":"Puxar riquixá"},
+{"c":"16040","m":6.0,"d":"Empurrar aviões no hangar"},
+{"c":"16050","m":2.5,"d":"Dirigir caminhão semi ou ônibus"},
+{"c":"16060","m":3.5,"d":"Caminhada utilitária (4,5-5,1 km/h)"},
+{"c":"17010","m":7.0,"d":"Mochilão (Backpacking)"},
+{"c":"17011","m":3.5,"d":"Caminhar com mochila de ataque (plano)"},
+{"c":"17012","m":7.8,"d":"Trilha organizada com mochila"},
+{"c":"17016","m":4.0,"d":"Carregar 2,3-6,4 kg caminhando"},
+{"c":"17018","m":4.5,"d":"Carregar 6,8-70 kg caminhando/descendo escada"},
+{"c":"17019","m":6.5,"d":"Carregar 23-68 kg (ração/tubos) no plano"},
+{"c":"17021","m":2.3,"d":"Carregar criança de ~4,5 kg caminhando"},
+{"c":"17025","m":8.3,"d":"Carregar carga escada acima, geral"},
+{"c":"17026","m":5.5,"d":"Carregar 0,5-6,8 kg escada acima"},
+{"c":"17027","m":6.0,"d":"Carregar 7-11 kg escada acima"},
+{"c":"17028","m":8.0,"d":"Carregar 11-22 kg escada acima"},
+{"c":"17029","m":10.0,"d":"Carregar 22,7-33,6 kg escada acima"},
+{"c":"17030","m":12.0,"d":"Carregar >33,6 kg escada acima"},
+{"c":"17031","m":3.8,"d":"Carregar/descarregar carro"},
+{"c":"17032","m":5.0,"d":"Subir colinas (5-20% inclinação), muito lento"},
+{"c":"17033","m":3.8,"d":"Subir colinas com 7-23 kg de carga, lento"},
+{"c":"17034","m":5.3,"d":"Subir colinas sem carga (1-5%), moderado/rápido"},
+{"c":"17035","m":7.0,"d":"Subir colinas sem carga (6-10%), moderado/rápido"},
+{"c":"17036","m":8.8,"d":"Subir colinas sem carga (11-20%), lento/moderado"},
+{"c":"17037","m":10.0,"d":"Subir colinas rápido (6,4-8 km/h, 3-5%)"},
+{"c":"17038","m":8.5,"d":"Subir colinas íngremes (30%), lento (<1,9 km/h)"},
+{"c":"17039","m":15.5,"d":"Subir colinas muito íngremes (30-40%, 2-3 km/h)"},
+{"c":"17040","m":16.3,"d":"Subir colinas íngremes (10-40%, 3-8 km/h)"},
+{"c":"17045","m":6.5,"d":"Subir colinas com 4,5-9 kg de carga, moderado"},
+{"c":"17050","m":7.5,"d":"Subir colinas com 9,5-18 kg de carga, moderado/rápido"},
+{"c":"17060","m":10.0,"d":"Subir colinas com >9 kg de carga, moderado/rápido"},
+{"c":"17070","m":3.5,"d":"Descer escadas"},
+{"c":"17076","m":4.5,"d":"Transportar água na cabeça, no plano"},
+{"c":"17080","m":6.0,"d":"Trilha cross country"},
+{"c":"17081","m":3.8,"d":"Caminhar lentamente por campos e colinas"},
+{"c":"17082","m":5.3,"d":"Caminhar em ritmo normal por campos e colinas"},
+{"c":"17085","m":2.5,"d":"Observar pássaros caminhando/parando"},
+{"c":"17088","m":4.5,"d":"Marcha militar, velocidade moderada, sem mochila"},
+{"c":"17090","m":8.0,"d":"Marcha militar rápida, sem mochila"},
+{"c":"17100","m":3.8,"d":"Caminhar com carrinho ou crianças (4-5 km/h)"},
+{"c":"17105","m":3.8,"d":"Empurrar cadeira de rodas (não ocupacional)"},
+{"c":"17110","m":6.5,"d":"Marcha atlética"},
+{"c":"17130","m":8.0,"d":"Subir escadas de mão"},
+{"c":"17131","m":6.8,"d":"Subir escadas, geral"},
+{"c":"17133","m":4.5,"d":"Subir escadas, lento"},
+{"c":"17134","m":9.3,"d":"Subir escadas rápido, um degrau por vez"},
+{"c":"17136","m":7.5,"d":"Subir escadas, dois degraus por vez"},
+{"c":"17138","m":7.5,"d":"Subir e descer escadas"},
+{"c":"17140","m":4.5,"d":"Usar muletas no plano"},
+{"c":"17142","m":7.0,"d":"Usar muletas rápido"},
+{"c":"17145","m":4.3,"d":"Usar patinete médico de joelho"},
+{"c":"17150","m":2.3,"d":"Caminhada doméstica"},
+{"c":"17151","m":2.3,"d":"Caminhada de passeio (<3,2 km/h, plano)"},
+{"c":"17152","m":2.8,"d":"Caminhada lenta (3,2-3,8 km/h, plano)"},
+{"c":"17160","m":3.5,"d":"Caminhada por prazer"},
+{"c":"17161","m":2.5,"d":"Caminhar para o carro/ônibus ou do transporte para destino"},
+{"c":"17162","m":2.5,"d":"Caminhar para casa de vizinho/família"},
+{"c":"17165","m":3.0,"d":"Passear com cachorro"},
+{"c":"17170","m":3.0,"d":"Caminhada (4 km/h, plano)"},
+{"c":"17180","m":3.3,"d":"Caminhada (4 km/h, descida)"},
+{"c":"17190","m":3.8,"d":"Caminhada moderada (4,5-5,5 km/h, plano)"},
+{"c":"17200","m":4.8,"d":"Caminhada rápida para exercício (5,6-6,3 km/h)"},
+{"c":"17220","m":5.5,"d":"Caminhada muito rápida (6,4-7 km/h)"},
+{"c":"17230","m":7.0,"d":"Caminhada extremamente rápida (7,2-7,9 km/h)"},
+{"c":"17231","m":8.5,"d":"Caminhada (8-8,9 km/h, plano)"},
+{"c":"17250","m":3.5,"d":"Caminhada em intervalo de trabalho"},
+{"c":"17255","m":4.0,"d":"Caminhada em ritmo livre (indoor/outdoor)"},
+{"c":"17260","m":4.8,"d":"Caminhada em pista de grama"},
+{"c":"17262","m":4.5,"d":"Caminhada em areia ou campo lavrado"},
+{"c":"17270","m":4.0,"d":"Caminhar para trabalho ou aula"},
+{"c":"17280","m":2.5,"d":"Caminhar de/para banheiro externo"},
+{"c":"17302","m":4.3,"d":"Caminhada Nórdica (4-5,6 km/h, plano)"},
+{"c":"17304","m":5.3,"d":"Caminhada Nórdica (5,8-7,1 km/h, plano)"},
+{"c":"17305","m":8.5,"d":"Caminhada Nórdica rápida (7,2-8 km/h)"},
+{"c":"17310","m":8.8,"d":"Caminhada Nórdica em subida"},
+{"c":"17313","m":10.8,"d":"Caminhada Nórdica com 9-15 kg de carga (plano)"},
+{"c":"17315","m":12.3,"d":"Caminhada Nórdica com 9-15 kg de carga (subida)"},
+{"c":"17320","m":6.0,"d":"Caminhada para trás (5,6 km/h, plano)"},
+{"c":"17325","m":7.8,"d":"Caminhada para trás em subida (5% inclinação)"},
+{"c":"17330","m":8.0,"d":"Caminhada 'Teabag' (Monty Python)"},
+{"c":"17332","m":3.5,"d":"Caminhada 'Putey' (Monty Python)"},
+{"c":"17340","m":2.1,"d":"Caminhada em esteira (<1,6 km/h)"},
+{"c":"17343","m":2.3,"d":"Caminhada em esteira (1,6 km/h)"},
+{"c":"17346","m":2.8,"d":"Caminhada em esteira (1,9-3 km/h)"},
+{"c":"17349","m":3.0,"d":"Caminhada em esteira (3,2-3,9 km/h)"},
+{"c":"17352","m":3.5,"d":"Caminhada em esteira (4-4,7 km/h)"},
+{"c":"17355","m":3.8,"d":"Caminhada em esteira (4,8-5,5 km/h)"},
+{"c":"17358","m":4.8,"d":"Caminhada em esteira (5,6-6,3 km/h)"},
+{"c":"17361","m":5.8,"d":"Caminhada em esteira (6,4-7,1 km/h)"},
+{"c":"17364","m":6.8,"d":"Caminhada em esteira (7,2-7,9 km/h)"},
+{"c":"17367","m":8.3,"d":"Caminhada em esteira (8-8,9 km/h)"},
+{"c":"17382","m":3.3,"d":"Caminhada em esteira, descida (-3% a -12%)"},
+{"c":"17412","m":3.3,"d":"Caminhada em esteira, descida (-5% a -25%) com bastões"},
+{"c":"17434","m":4.8,"d":"Caminhada em esteira (4 km/h, 18 kg carga, clima ameno)"},
+{"c":"17438","m":5.8,"d":"Caminhada em esteira (4 km/h, 18 kg carga, frio intenso)"},
+{"c":"17455","m":8.3,"d":"Caminhada em esteira curva (4,8-8 km/h)"},
+{"c":"17475","m":7.8,"d":"Caminhada em esteira para trás (4 km/h, +10% inclinação)"},
+{"c":"17492","m":1.5,"d":"Caminhada com andador na esteira (1,1 km/h)"},
+{"c":"18010","m":2.5,"d":"Dirigir lancha motorizada"},
+{"c":"18012","m":1.3,"d":"Passageiro em lancha motorizada"},
+{"c":"18020","m":4.0,"d":"Canoagem em acampamento"},
+{"c":"18025","m":3.3,"d":"Canoagem, colheita de arroz selvagem"},
+{"c":"18030","m":7.0,"d":"Canoagem (portagem/carregar canoa)"},
+{"c":"18040","m":2.8,"d":"Canoagem/remo (3,2-6,3 km/h, leve)"},
+{"c":"18050","m":5.8,"d":"Canoagem/remo (6,4-9,5 km/h, moderado)"},
+{"c":"18060","m":12.5,"d":"Canoagem/caiaque competição (>9,6 km/h)"},
+{"c":"18070","m":3.5,"d":"Canoagem recreativa geral"},
+{"c":"18080","m":12.0,"d":"Remo de competição (tripulação)"},
+{"c":"18090","m":3.0,"d":"Mergulho de trampolim ou plataforma"},
+{"c":"18100","m":5.0,"d":"Caiaque, esforço moderado"},
+{"c":"18104","m":13.5,"d":"Caiaque competição"},
+{"c":"18106","m":9.0,"d":"Caiaque slalom, águas calmas"},
+{"c":"18110","m":4.0,"d":"Pedalinho"},
+{"c":"18112","m":15.5,"d":"Remo simulado em tanque (33 remadas/min)"},
+{"c":"18114","m":15.5,"d":"Remo scull simples/ergômetro velocidade corrida"},
+{"c":"18120","m":3.0,"d":"Vela, windsurf ou iatismo no gelo"},
+{"c":"18130","m":4.5,"d":"Vela em competição geral"},
+{"c":"18132","m":9.3,"d":"Vela em competição, alto esforço"},
+{"c":"18140","m":3.3,"d":"Iatismo de lazer/veleiros pequenos"},
+{"c":"18142","m":2.0,"d":"Navegar em bote (dingy)"},
+{"c":"18150","m":6.0,"d":"Esqui aquático ou wakeboarding"},
+{"c":"18160","m":7.0,"d":"Jet esqui na água"},
+{"c":"18180","m":15.8,"d":"Mergulho livre rápido (skindiving)"},
+{"c":"18190","m":11.8,"d":"Mergulho livre moderado"},
+{"c":"18200","m":7.0,"d":"Mergulho autônomo (scuba) geral"},
+{"c":"18202","m":5.3,"d":"Mergulho autônomo leve"},
+{"c":"18204","m":5.8,"d":"Mergulho autônomo moderado"},
+{"c":"18206","m":5.5,"d":"Mergulho autônomo profissional"},
+{"c":"18208","m":6.8,"d":"Mergulho autônomo recreativo"},
+{"c":"18210","m":5.0,"d":"Mergulho com snorkel"},
+{"c":"18220","m":3.0,"d":"Surfe ou bodyboard geral"},
+{"c":"18221","m":6.8,"d":"Remada na prancha de surfe"},
+{"c":"18222","m":5.0,"d":"Surfe ou bodyboard competitivo"},
+{"c":"18224","m":6.5,"d":"Stand up paddle geral"},
+{"c":"18225","m":2.8,"d":"Stand up paddle (10-19 remadas/min)"},
+{"c":"18226","m":3.8,"d":"Stand up paddle (20-29 remadas/min)"},
+{"c":"18227","m":5.0,"d":"Stand up paddle (30-39 remadas/min)"},
+{"c":"18228","m":9.8,"d":"Stand up paddle (40-49 remadas/min)"},
+{"c":"18229","m":11.0,"d":"Stand up paddle (50-69 remadas/min)"},
+{"c":"18230","m":9.8,"d":"Natação por voltas, crawl rápido, vigoroso"},
+{"c":"18240","m":5.8,"d":"Natação por voltas, crawl lento, recreativo"},
+{"c":"18250","m":9.5,"d":"Natação costas (treino/competição)"},
+{"c":"18255","m":4.8,"d":"Natação costas recreativo"},
+{"c":"18260","m":10.3,"d":"Natação peito (treino/competição)"},
+{"c":"18265","m":5.3,"d":"Natação peito recreativo"},
+{"c":"18270","m":13.8,"d":"Natação borboleta geral"},
+{"c":"18280","m":10.5,"d":"Natação crawl rápido (~68 m/min)"},
+{"c":"18285","m":10.5,"d":"Natação águas abertas (5k)"},
+{"c":"18290","m":8.0,"d":"Natação crawl médio (~45 m/min)"},
+{"c":"18292","m":5.8,"d":"Natação crawl lento (27-41 m/min)"},
+{"c":"18294","m":14.5,"d":"Natação crawl (elite/competição >82 m/min)"},
+{"c":"18300","m":6.0,"d":"Natação em lago, oceano ou rio"},
+{"c":"18310","m":6.0,"d":"Natação de lazer geral"},
+{"c":"18320","m":7.0,"d":"Natação nado lateral"},
+{"c":"18330","m":8.0,"d":"Natação sincronizada"},
+{"c":"18340","m":9.8,"d":"Flutuar na água (treading water), rápido/vigoroso"},
+{"c":"18350","m":3.5,"d":"Flutuar na água, moderado/geral"},
+{"c":"18352","m":2.3,"d":"Boia (tubing) no rio"},
+{"c":"18355","m":5.5,"d":"Hidroginástica geral"},
+{"c":"18356","m":3.8,"d":"Hidroginástica com resistência"},
+{"c":"18358","m":7.5,"d":"Hidroginástica alta intensidade"},
+{"c":"18360","m":10.0,"d":"Polo aquático"},
+{"c":"18365","m":3.0,"d":"Voleibol aquático"},
+{"c":"18366","m":9.8,"d":"Corrida aquática vigorosa"},
+{"c":"18367","m":2.5,"d":"Caminhada aquática lenta"},
+{"c":"18368","m":4.8,"d":"Caminhada aquática moderada"},
+{"c":"18369","m":6.8,"d":"Caminhada aquática vigorosa/rápida"},
+{"c":"18370","m":5.0,"d":"Rafting ou caiaque em corredeiras"},
+{"c":"18374","m":6.5,"d":"Corrida aquática lenta (30 passos/min)"},
+{"c":"18375","m":7.5,"d":"Corrida aquática moderada (40 passos/min)"},
+{"c":"18376","m":8.5,"d":"Corrida aquática rápida (50 passos/min)"},
+{"c":"18377","m":9.8,"d":"Corrida aquática muito rápida (60 passos/min)"},
+{"c":"18380","m":5.0,"d":"Windsurf recreativo"},
+{"c":"18385","m":11.0,"d":"Windsurf ou kitesurf profissional"},
+{"c":"18390","m":14.0,"d":"Windsurf competição"},
+{"c":"18404","m":2.8,"d":"Ciclismo aquático (25 W, 40-50 RPM)"},
+{"c":"18408","m":4.8,"d":"Ciclismo aquático (25 W, 60-70 RPM)"},
+{"c":"18412","m":3.8,"d":"Ciclismo aquático (50 W, 40-50 RPM)"},
+{"c":"18416","m":6.0,"d":"Ciclismo aquático (50 W, 60-70 RPM)"},
+{"c":"18420","m":5.0,"d":"Ciclismo aquático (75 W, 40-50 RPM)"},
+{"c":"18424","m":6.3,"d":"Ciclismo aquático (75 W, 60-70 RPM)"},
+{"c":"18428","m":6.3,"d":"Ciclismo aquático (100 W, 40-50 RPM)"},
+{"c":"18432","m":7.5,"d":"Ciclismo aquático (100 W, 60-70 RPM)"},
+{"c":"18436","m":8.5,"d":"Ciclismo aquático (80-89 RPM)"},
+{"c":"18440","m":10.3,"d":"Ciclismo aquático (90+ RPM)"},
+{"c":"19005","m":7.5,"d":"Trenó de cães (mushing)"},
+{"c":"19006","m":2.5,"d":"Trenó de cães (passageiro)"},
+{"c":"19010","m":6.0,"d":"Montar abrigo de pesca no gelo"},
+{"c":"19011","m":2.0,"d":"Pesca no gelo"},
+{"c":"19018","m":14.0,"d":"Patinação artística/dança no gelo"},
+{"c":"19020","m":5.5,"d":"Patinação no gelo lento (14,5 km/h)"},
+{"c":"19030","m":7.0,"d":"Patinação no gelo geral"},
+{"c":"19040","m":9.0,"d":"Patinação no gelo rápida (>14,5 km/h)"},
+{"c":"19045","m":9.0,"d":"Esteira de patinação (9,6-11 km/h, 2% inclinação)"},
+{"c":"19046","m":10.0,"d":"Esteira de patinação (123-126 km/h, 2% inclinação)"},
+{"c":"19047","m":10.5,"d":"Esteira de patinação (12,8-14,3 km/h, 2% inclinação)"},
+{"c":"19048","m":11.0,"d":"Esteira de patinação (159-160 km/h, 2% inclinação)"},
+{"c":"19050","m":13.8,"d":"Patinação de velocidade competitiva"},
+{"c":"19060","m":7.0,"d":"Salto de esqui (carregar esquis na subida)"},
+{"c":"19075","m":7.0,"d":"Esqui geral"},
+{"c":"19080","m":6.8,"d":"Esqui cross country lento/caminhada (4 km/h)"},
+{"c":"19090","m":8.5,"d":"Esqui cross country moderado (6,4-7,9 km/h)"},
+{"c":"19100","m":11.3,"d":"Esqui cross country rápido/vigoroso (8-12,7 km/h)"},
+{"c":"19110","m":14.0,"d":"Esqui cross country elite/corrida (12,8-19 km/h)"},
+{"c":"19112","m":16.0,"d":"Esqui cross country elite/corrida (19,3-25,7 km/h)"},
+{"c":"19115","m":9.5,"d":"Treino de esqui cross country de alta intensidade"},
+{"c":"19130","m":15.5,"d":"Esqui cross country em subida máxima/neve dura"},
+{"c":"19135","m":13.3,"d":"Esqui cross country técnica de patinação"},
+{"c":"19140","m":13.5,"d":"Biatlo técnica de patinação"},
+{"c":"19142","m":12.8,"d":"Biatlo (8 km/h, 5 graus inclinação)"},
+{"c":"19144","m":12.8,"d":"Biatlo (10,7 km/h, 5 graus inclinação)"},
+{"c":"19146","m":9.3,"d":"Esqui slalom"},
+{"c":"19150","m":4.3,"d":"Esqui alpino ou snowboard leve"},
+{"c":"19160","m":6.3,"d":"Esqui alpino ou snowboard moderado"},
+{"c":"19170","m":8.0,"d":"Esqui alpino ou snowboard vigoroso"},
+{"c":"19174","m":7.3,"d":"Treino de esqui alpino de alta intensidade"},
+{"c":"19180","m":7.0,"d":"Trenó/Bobsled/Luge"},
+{"c":"19190","m":5.3,"d":"Caminhada com raquetes de neve, moderado"},
+{"c":"19192","m":10.0,"d":"Caminhada com raquetes de neve, vigoroso"},
+{"c":"19200","m":3.8,"d":"Dirigir moto de neve em terreno plano"},
+{"c":"19201","m":7.5,"d":"Snowboard recreativo em montanha"},
+{"c":"19202","m":2.0,"d":"Passageiro em moto de neve"},
+{"c":"19252","m":5.3,"d":"Palear neve à mão, moderado"},
+{"c":"19254","m":7.5,"d":"Palear neve à mão, vigoroso"},
+{"c":"19260","m":2.5,"d":"Soprador de neve (empurrar)"},
+{"c":"19300","m":12.5,"d":"Esqui com rodas (roller skiing) elite"},
+{"c":"19305","m":5.5,"d":"Esqui com rodas (10-12,9 km/h, sem inclinação)"},
+{"c":"19310","m":6.8,"d":"Esqui com rodas (13-16,9 km/h, sem inclinação)"},
+{"c":"19315","m":8.3,"d":"Esqui com rodas (17-19,9 km/h, sem inclinação)"},
+{"c":"19320","m":10.5,"d":"Esqui com rodas (20-23,9 km/h, sem inclinação)"},
+{"c":"19325","m":15.0,"d":"Esqui com rodas (24-27,9 km/h, sem inclinação)"},
+{"c":"19330","m":12.5,"d":"Esqui com rodas em subida (2-5 graus)"},
+{"c":"19340","m":12.3,"d":"Esqui com rodas em subida (6-10 graus, 6-9 km/h)"},
+{"c":"19345","m":16.0,"d":"Esqui com rodas em subida (6-10 graus, >10 km/h)"},
+{"c":"19405","m":10.3,"d":"Alpinismo/Esqui cross country"},
+{"c":"20000","m":1.0,"d":"Sentado em cerimônia religiosa (silencioso)"},
+{"c":"20001","m":2.0,"d":"Sentado tocando instrumento na igreja"},
+{"c":"20005","m":1.8,"d":"Participação ativa em cerimônia religiosa (falar/cantar)"},
+{"c":"20010","m":1.5,"d":"Ler materiais religiosos sentado em casa"},
+{"c":"20015","m":1.3,"d":"Ficar em pé silenciosamente na igreja"},
+{"c":"20020","m":2.0,"d":"Cantar na igreja em pé"},
+{"c":"20025","m":1.3,"d":"Orar ajoelhado na igreja ou em casa"},
+{"c":"20030","m":1.3,"d":"Conversar na igreja (em pé)"},
+{"c":"20035","m":2.0,"d":"Caminhar na igreja"},
+{"c":"20036","m":2.0,"d":"Caminhada religiosa lenta (<3,2 km/h)"},
+{"c":"20037","m":3.8,"d":"Caminhada religiosa moderada (4,5-5,5 km/h)"},
+{"c":"20038","m":4.8,"d":"Caminhada religiosa rápida (5,6-6,3 km/h)"},
+{"c":"20039","m":2.0,"d":"Atuar como recepcionista/usher na igreja"},
+{"c":"20040","m":5.0,"d":"Dança espiritual ou corrida de louvor na igreja"},
+{"c":"20045","m":2.3,"d":"Servir comida na igreja"},
+{"c":"20046","m":2.0,"d":"Preparar comida na igreja"},
+{"c":"20047","m":3.3,"d":"Lavar louça/limpar cozinha na igreja"},
+{"c":"20050","m":1.5,"d":"Comer na igreja"},
+{"c":"20055","m":2.0,"d":"Comer/falar em banquetes religiosos tradicionais"},
+{"c":"20060","m":3.3,"d":"Limpeza da igreja"},
+{"c":"20061","m":4.0,"d":"Trabalho de jardinagem na igreja"},
+{"c":"20065","m":3.8,"d":"Trabalho manual moderado na igreja"},
+{"c":"20095","m":4.5,"d":"Trabalho pesado/manutenção (>22,7 kg) na igreja"},
+{"c":"20100","m":1.3,"d":"Digitação/trabalho de escritório na igreja"},
+{"c":"21000","m":1.3,"d":"Reuniões de voluntariado sentado"},
+{"c":"21005","m":1.5,"d":"Escritório leve (voluntariado)"},
+{"c":"21010","m":2.5,"d":"Trabalho moderado sentado (voluntariado)"},
+{"c":"21015","m":1.8,"d":"Trabalho leve em pé (arquivar/conversar)"},
+{"c":"21016","m":2.0,"d":"Cuidado infantil sentado (voluntariado)"},
+{"c":"21017","m":3.5,"d":"Cuidado infantil em pé (voluntariado)"},
+{"c":"21018","m":3.5,"d":"Brincar com crianças, moderado (voluntariado)"},
+{"c":"21019","m":5.8,"d":"Brincar com crianças, vigoroso (voluntariado)"},
+{"c":"21020","m":3.3,"d":"Montar cadeiras/caixas (leve/moderado)"},
+{"c":"21025","m":3.5,"d":"Levantar 22,7 kg/trabalho moderado"},
+{"c":"21030","m":4.5,"d":"Trabalho moderado/pesado em pé"},
+{"c":"21035","m":1.3,"d":"Digitar em computador (voluntariado)"},
+{"c":"21040","m":2.3,"d":"Caminhada lenta voluntariado (<3,2 km/h)"},
+{"c":"21045","m":3.8,"d":"Caminhada moderada voluntariado (4,5-5,5 km/h)"},
+{"c":"21050","m":4.8,"d":"Caminhada rápida voluntariado (5,6-6,3 km/h)"},
+{"c":"21055","m":3.5,"d":"Caminhar com <11 kg de carga, lento"},
+{"c":"21060","m":4.5,"d":"Caminhar com <11 kg de carga, moderado"},
+{"c":"21065","m":4.5,"d":"Caminhar com <11 kg de carga, rápido"},
+{"c":"21070","m":3.0,"d":"Combinação caminhar/em pé voluntariado"},
+{"c":"22040","m":1.3,"d":"Videogame sentado, controle manual (inativo)"},
+{"c":"22120","m":1.5,"d":"Videogame sentado, esforço leve"},
+{"c":"22160","m":2.3,"d":"Videogame esforço leve (Wii Fit/Yoga/Boliche)"},
+{"c":"22200","m":3.0,"d":"Videogame ativo corpo superior (leve/moderado)"},
+{"c":"22240","m":4.0,"d":"Videogame ativo corpo total (moderado)"},
+{"c":"22280","m":5.0,"d":"Videogame ativo corpo total (moderado/vigoroso)"},
+{"c":"22320","m":7.5,"d":"Exergames/Dança corpo total (vigoroso)"},
+{"c":"22360","m":9.8,"d":"Fitness em VR (Realidade Virtual) intensidade vigorosa"}
+            // [Nota: Aqui entram as mais de 1000 linhas processadas do seu arquivo]
+        ];
+        
+        // Em um sistema real com 1000+ linhas, carregaríamos via fetch. 
+        // Para este código autônomo, estou garantindo que o buscador aceite qualquer item do seu TXT.
+        MET_DATABASE = rawData;
+    }
+
+    loadMetData();
+
+    let currentNaf = 1.2;
+    let selectedMet = null;
+    let userActivities = [];
+
+    function toggleNafDropdown() {
+        document.getElementById('nafOptions').classList.toggle('show');
+    }
+
+    function selectNaf(val, title, desc) {
+        currentNaf = val;
+        document.getElementById('nafValue').innerHTML = `<span class="option-title">${title}</span>`;
+        document.getElementById('nafOptions').classList.remove('show');
+    }
+
+    function openModal() { 
+        document.getElementById('modal').style.display = 'flex'; 
+        document.getElementById('metInput').focus();
+    }
+    
+    function closeModal() { 
+        document.getElementById('modal').style.display = 'none'; 
+        document.getElementById('metSearchResults').style.display = 'none';
+        document.getElementById('metInput').value = "";
+    }
+
+    function searchMet() {
+        const query = document.getElementById('metInput').value.toLowerCase();
+        const resultsDiv = document.getElementById('metSearchResults');
+        resultsDiv.innerHTML = "";
+        
+        if(!query || query.length < 2) { 
+            resultsDiv.style.display = "none"; 
+            return; 
+        }
+
+        const filtered = MET_DATABASE.filter(item => 
+            item.d.toLowerCase().includes(query) || item.c.includes(query)
+        );
+
+        if(filtered.length > 0) {
+            filtered.forEach(item => {
+                const div = document.createElement('div');
+                div.className = "met-item";
+                div.innerHTML = `<strong>${item.m} MET</strong> - ${item.d} <small>(Cod: ${item.c})</small>`;
+                div.onclick = () => {
+                    selectedMet = item;
+                    document.getElementById('metInput').value = item.d;
+                    resultsDiv.style.display = "none";
+                };
+                resultsDiv.appendChild(div);
+            });
+            resultsDiv.style.display = "block";
+        } else {
+            resultsDiv.style.display = "none";
+        }
+    }
+
+    function addActivity() {
+        if(!selectedMet) return alert("Selecione uma atividade da lista de busca!");
+        const dur = parseFloat(document.getElementById('metDur').value);
+        const freq = parseFloat(document.getElementById('metFreq').value);
+        const per = parseFloat(document.getElementById('metPer').value);
+
+        userActivities.push({ d: selectedMet.d, m: selectedMet.m, c: selectedMet.c, dur, freq, per });
+        renderActivities();
+        closeModal();
+        selectedMet = null;
+        document.getElementById('metInput').value = '';
+    }
+
+    function renderActivities() {
+        const box = document.getElementById('listaVisual');
+        box.style.display = userActivities.length ? "flex" : "none";
+        box.innerHTML = "";
+        userActivities.forEach((act, idx) => {
+            const periodLabel = act.per == 1 ? 'dia' : act.per == 7 ? 'sem' : 'mês';
+            box.innerHTML += `
+                <div class="activity-tag">
+                    <span>${act.d.substring(0, 30)}... (Cod:${act.c || '?'})</span>
+                    <span class="remove-btn" onclick="userActivities.splice(${idx},1); renderActivities();">✕</span>
+                </div>`;
+        });
+    }
+
+    function calcular() {
+        const peso = parseFloat(document.getElementById('peso').value);
+        const altura = parseFloat(document.getElementById('altura').value);
+        const idade = parseFloat(document.getElementById('idade').value);
+        const sexo = document.getElementById('sexo').value;
+        const nome = document.getElementById('nome').value || "Usuário";
+
+        if(!peso || !altura || !idade) return alert("Preencha Peso, Altura e Idade!");
+
+        const imc = peso / ((altura/100)**2);
+        let tmb = 0;
+        let metodo = "";
+
+        if(imc < 25) {
+            metodo = "Harris & Benedict (1919) - Perfil Eutrófico";
+            if(sexo === 'm') tmb = 66.47 + (13.75 * peso) + (5.003 * altura) - (6.755 * idade);
+            else tmb = 655.1 + (9.563 * peso) + (1.85 * altura) - (4.676 * idade);
+        } else {
+            metodo = "Mifflin-St Jeor (1990) - Perfil Sobrepeso/Obesidade";
+            if(sexo === 'm') tmb = (10 * peso) + (6.25 * altura) - (5 * idade) + 5;
+            else tmb = (10 * peso) + (6.25 * altura) - (5 * idade) - 161;
+        }
+
+        let extraCals = 0;
+        userActivities.forEach(a => {
+            const calSessao = a.m * peso * (a.dur / 60);
+            extraCals += (calSessao * a.freq) / a.per;
+        });
+
+        const getFinal = (tmb * currentNaf) + extraCals;
+
+        document.getElementById('res-tmb').innerText = tmb.toFixed(2) + " kcal";
+        document.getElementById('res-get').innerText = getFinal.toFixed(2) + " kcal";
+        document.getElementById('res-metodo').innerText = `${metodo} | IMC: ${imc.toFixed(1)}`;
+        document.getElementById('resultado').style.display = "block";
+        
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    }
+
+    function baixarPDF() {
+        try {
+            const { jsPDF } = window.jspdf;
+            if (!jsPDF) {
+                throw new Error('Biblioteca jsPDF não carregada');
+            }
+            
+            const doc = new jsPDF('p', 'mm', 'a4');
+            
+            // Coletar dados
+            const nome = document.getElementById('nome')?.value || 'Não informado';
+            const sexoValue = document.getElementById('sexo')?.value || '';
+            const sexo = sexoValue === 'm' ? 'Masculino' : sexoValue === 'f' ? 'Feminino' : 'Não informado';
+            const idade = document.getElementById('idade')?.value || 'N/A';
+            const peso = document.getElementById('peso')?.value || 'N/A';
+            const altura = document.getElementById('altura')?.value || 'N/A';
+            const nafText = document.getElementById('nafValue')?.innerText || 'N/A';
+            const tmb = document.getElementById('res-tmb')?.innerText || '0 kcal';
+            const get = document.getElementById('res-get')?.innerText || '0 kcal';
+            
+            // Calcular IMC e método
+            const pesoNum = parseFloat(peso);
+            const alturaNum = parseFloat(altura) / 100;
+            let imc = 0;
+            if (pesoNum > 0 && alturaNum > 0) {
+                imc = pesoNum / (alturaNum * alturaNum);
+            }
+            const metodo = `Mifflin-St Jeor (1990) - Perfil Sobrepeso/Obesidade | IMC: ${imc > 0 ? imc.toFixed(1) : 'N/A'}`;
+            
+            // Fundo
+            doc.setFillColor(250, 248, 241);
+            doc.rect(0, 0, 210, 297, 'F');
+            
+            // Carregar e adicionar logo
+            const logo = new Image();
+            logo.src = 'logo2cor.png';
+            logo.onload = function() {
+                // Calcular proporção da imagem para não distorcer
+                const imgWidth = logo.naturalWidth;
+                const imgHeight = logo.naturalHeight;
+                const aspectRatio = imgWidth / imgHeight;
+                
+                // Definir largura desejada e calcular altura proporcional
+                const desiredWidth = 70;
+                const desiredHeight = desiredWidth / aspectRatio;
+                
+                // Centralizar horizontalmente
+                const xPos = (210 - desiredWidth) / 2;
+                
+                doc.addImage(logo, 'PNG', xPos, 10, desiredWidth, desiredHeight);
+                continuarGeracao();
+            };
+            
+            logo.onerror = function() {
+                // Se não carregar, continua sem logo
+                continuarGeracao();
+            };
+            
+            function continuarGeracao() {
+                // Título - "Resultado da sua"
+                doc.setFontSize(14);
+                doc.setTextColor(81, 81, 81);
+                doc.setFont('helvetica', 'normal');
+                
+                // Fundo amarelo para "Resultado da sua" (sem bordas arredondadas)
+                const text1 = 'Resultado da sua';
+                const textWidth1 = doc.getTextWidth(text1);
+                doc.setFillColor(250, 235, 177); // #FAEAB1
+                doc.rect(105 - textWidth1/2 - 2, 60, textWidth1 + 4, 8, 'F');
+                doc.text(text1, 105, 66, { align: 'center' });
+                
+                // "composição corporal" em fonte script (simulando SwirlyCanalope)
+                doc.setFont('times', 'bolditalic');
+                doc.setFontSize(28.8);
+                doc.setTextColor(52, 101, 109); // #34656D
+                doc.text('composição corporal', 105, 75, { align: 'center' });
+                
+                // Coluna esquerda - Dados pessoais
+                let yPos = 95;
+                const xLeft = 20;
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(10);
+                
+                const campos = [
+                    { label: 'Nome da pessoa', value: nome },
+                    { label: 'Sexo', value: sexo },
+                    { label: 'Idade', value: idade + ' anos' },
+                    { label: 'Peso (kg)', value: peso + ' kg' },
+                    { label: 'Altura (cm)', value: altura + ' cm' },
+                    { label: 'Nível de Atividade (NAF)', value: nafText }
+                ];
+                
+                campos.forEach(campo => {
+                    doc.setFillColor(52, 101, 109);
+                    doc.roundedRect(xLeft, yPos, 70, 10, 5, 5, 'F');
+                    doc.setTextColor(255, 255, 255);
+                    doc.setFont('helvetica', 'bold');
+                    doc.text(campo.value, xLeft + 5, yPos + 6.5);
+                    yPos += 13;
+                });
+                
+                // Coluna direita - "Suas" com fundo amarelo (sem bordas arredondadas)
+                const text2 = 'Suas';
+                const textWidth2 = doc.getTextWidth(text2);
+                doc.setFontSize(14);
+                doc.setFont('helvetica', 'normal');
+                doc.setTextColor(81, 81, 81);
+                doc.setFillColor(250, 235, 177);
+                doc.rect(145 - textWidth2/2 - 2, 92, textWidth2 + 4, 8, 'F');
+                doc.text(text2, 145, 98, { align: 'center' });
+                
+                // "atividades físicas" em fonte script (simulando SwirlyCanalope)
+                doc.setFont('times', 'bolditalic');
+                doc.setFontSize(26.4);
+                doc.setTextColor(52, 101, 109);
+                doc.text('atividades físicas', 145, 106, { align: 'center' });
+                
+                // Tags de atividades com borda tracejada (uma abaixo da outra)
+                let yActivity = 111;
+                const xActivity = 110;
+                const boxWidth = 80; // Largura fixa maior para as caixas
+                doc.setFontSize(9);
+                doc.setFont('helvetica', 'normal');
+                
+                userActivities.forEach((activity, index) => {
+                    let text = activity.d; // Texto completo
+                    
+                    // Verificar se o texto é muito longo e adicionar '...'
+                    const maxTextWidth = boxWidth - 8; // Margem interna
+                    let textWidth = doc.getTextWidth(text);
+                    
+                    if (textWidth > maxTextWidth) {
+                        // Reduzir texto até caber com '...'
+                        while (doc.getTextWidth(text + '...') > maxTextWidth && text.length > 0) {
+                            text = text.substring(0, text.length - 1);
+                        }
+                        text += '...';
+                    }
+                    
+                    doc.setDrawColor(52, 101, 109);
+                    doc.setLineWidth(0.3);
+                    doc.setLineDash([2, 2]); // Linha tracejada
+                    doc.roundedRect(xActivity, yActivity, boxWidth, 7, 3, 3, 'S');
+                    doc.setLineDash([]); // Resetar para linha sólida
+                    doc.setTextColor(52, 101, 109);
+                    doc.text(text, xActivity + 3, yActivity + 5);
+                    
+                    yActivity += 9; // Espaçamento vertical entre atividades
+                    
+                    if (index >= 7) return; // Limitar quantidade
+                });
+                
+                // Carregar ícones
+                const iconCalorias = new Image();
+                const iconGasto = new Image();
+                let iconesCarregados = 0;
+                
+                iconCalorias.src = 'icon-calorias.png';
+                iconGasto.src = 'icon-gasto-energetico.png';
+                
+                function verificarIcones() {
+                    iconesCarregados++;
+                    if (iconesCarregados === 2) {
+                        finalizarPDF();
+                    }
+                }
+                
+                iconCalorias.onload = verificarIcones;
+                iconCalorias.onerror = verificarIcones;
+                iconGasto.onload = verificarIcones;
+                iconGasto.onerror = verificarIcones;
+                
+                function finalizarPDF() {
+                    // Resultados - TMB (sem retângulo)
+                    yPos = 185;
+                    
+                    // Adicionar ícone calorias com melhor qualidade
+                    if (iconCalorias.complete && iconCalorias.naturalHeight !== 0) {
+                        // Usar canvas para melhorar a qualidade da renderização
+                        const canvasIcon1 = document.createElement('canvas');
+                        const ctxIcon1 = canvasIcon1.getContext('2d');
+                        canvasIcon1.width = 200;
+                        canvasIcon1.height = 200;
+                        ctxIcon1.imageSmoothingEnabled = true;
+                        ctxIcon1.imageSmoothingQuality = 'high';
+                        ctxIcon1.drawImage(iconCalorias, 0, 0, 200, 200);
+                        const iconData1 = canvasIcon1.toDataURL('image/png', 1.0);
+                        doc.addImage(iconData1, 'PNG', 20, yPos + 6, 20, 20);
+                    } else {
+                        // Fallback: círculo amarelo
+                        doc.setFillColor(245, 158, 11);
+                        doc.circle(30, yPos + 16, 10, 'F');
+                    }
+                    
+                    doc.setFont('helvetica', 'normal');
+                    doc.setFontSize(10);
+                    doc.setTextColor(74, 85, 104);
+                    doc.text('Taxa Metabólica Basal', 45, yPos + 10);
+                    doc.setFont('helvetica', 'bold');
+                    doc.setFontSize(28);
+                    doc.setTextColor(45, 95, 93);
+                    doc.text(tmb, 45, yPos + 22);
+                    
+                    // Resultados - GET (lado a lado com TMB)
+                    
+                    // Adicionar ícone gasto energético com melhor qualidade
+                    if (iconGasto.complete && iconGasto.naturalHeight !== 0) {
+                        // Usar canvas para melhorar a qualidade da renderização
+                        const canvasIcon2 = document.createElement('canvas');
+                        const ctxIcon2 = canvasIcon2.getContext('2d');
+                        canvasIcon2.width = 200;
+                        canvasIcon2.height = 200;
+                        ctxIcon2.imageSmoothingEnabled = true;
+                        ctxIcon2.imageSmoothingQuality = 'high';
+                        ctxIcon2.drawImage(iconGasto, 0, 0, 200, 200);
+                        const iconData2 = canvasIcon2.toDataURL('image/png', 1.0);
+                        doc.addImage(iconData2, 'PNG', 105, yPos + 6, 20, 20);
+                    } else {
+                        // Fallback: círculo amarelo
+                        doc.setFillColor(252, 211, 77);
+                        doc.circle(115, yPos + 16, 10, 'F');
+                    }
+                    
+                    doc.setFont('helvetica', 'normal');
+                    doc.setFontSize(10);
+                    doc.setTextColor(74, 85, 104);
+                    doc.text('Gasto Energético Total (GET)', 130, yPos + 10);
+                    doc.setFont('helvetica', 'bold');
+                    doc.setFontSize(28);
+                    doc.setTextColor(45, 95, 93);
+                    doc.text(get, 130, yPos + 22);
+                    
+                    // Rodapé - Método (mais para cima)
+                    doc.setFont('helvetica', 'bolditalic');
+                    doc.setFontSize(9.6);
+                    doc.setTextColor(107, 114, 128);
+                    doc.text(metodo, 105, 230, { align: 'center' });
+                    
+                    // Salvar PDF
+                    doc.save(`Resultado_Composicao_Corporal_${nome.replace(/\s+/g, '_')}.pdf`);
+                }
+            }
+        } catch (error) {
+            console.error('Erro ao gerar PDF:', error);
+            alert('Erro ao gerar PDF: ' + error.message);
+        }
+    }
+
+    function compartilhar() {
+        if (navigator.share) {
+            navigator.share({
+                title: 'Meu Resultado - Calculadora de Calorias',
+                text: `TMB: ${document.getElementById('res-tmb').innerText}\nGET: ${document.getElementById('res-get').innerText}`
+            });
+        } else {
+            alert("Funcionalidade de compartilhamento não disponível neste navegador.");
+        }
+    }
+
+    window.onclick = function(event) {
+        if (!event.target.closest('.custom-select-wrapper')) {
+            document.getElementById('nafOptions').classList.remove('show');
+        }
+    }
+
+    // Reveal itens ao entrar na tela
+    const revealItems = Array.from(
+        document.querySelectorAll('.logo, h1, .page-content > *')
+    ).filter(el => el.tagName !== 'STYLE');
+
+    revealItems.forEach(el => el.classList.add('reveal-item'));
+
+    const revealObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('in-view');
+                revealObserver.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.2 });
+
+    revealItems.forEach(el => revealObserver.observe(el));
+</script>
+
+</div>
+</body>
+</html>
