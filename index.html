@@ -4,6 +4,25 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Trilha do Paciente</title>
+
+<!-- Microsoft Clarity -->
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "v95a18cmnk");
+</script>
+
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-XLTZJZFG06"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-XLTZJZFG06');
+</script>
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Yeseva+One&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
@@ -56,12 +75,22 @@ body {
 
 /* ================= MENU DINÂMICO ================= */
 .menu-wrapper { 
-  position: sticky; 
-  top: 60px; 
+  position: static; 
+  top: auto; 
   z-index: 9999; 
   padding: 0; 
   transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); 
   width: 100%;
+}
+
+.menu-bar {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 12px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
 }
 
 .menu-wrapper.scrolled { 
@@ -69,8 +98,6 @@ body {
 }
 
 .menu {
-  max-width: 1200px;
-  margin: 0 auto;
   background: transparent;
   border-radius: 40px;
   padding: 12px 32px;
@@ -78,25 +105,40 @@ body {
   justify-content: space-between; 
   align-items: center;
   transition: all 0.3s ease;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-  border: 1px solid rgba(0,0,0,0.05);
+  box-shadow: none;
+  border: none;
+  flex: 0 0 auto;
 }
 
 .menu-wrapper.scrolled .menu { 
-  background: rgba(250, 248, 241, 0.95);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+  background: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  box-shadow: none;
   transform: scale(0.96); 
 }
 
 .logo-container {
   display: flex;
   align-items: center;
+  transform: translateX(15%) translateY(35%);
+  opacity: 1;
+  animation: logoSlideIn 0.8s ease-out both;
+}
+
+@keyframes logoSlideIn {
+  from {
+    transform: translateX(-20%) translateY(35%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(15%) translateY(35%);
+    opacity: 1;
+  }
 }
 
 .logo-container img {
-  max-height: 60px;
+  max-height: 100px;
   width: auto;
   display: block;
   transition: max-height 0.3s ease;
@@ -118,7 +160,7 @@ body {
   padding-bottom: 4px; 
 }
 
-.menu-center a::after { content: ""; position: absolute; left: 0; bottom: 0; width: 0; height: 2px; background: #4CAF50; transition: width 0.3s ease; }
+.menu-center a::after { content: ""; position: absolute; left: 0; bottom: 0; width: 0; height: 2px; background: #34656d; transition: width 0.3s ease; }
 .menu-center a:hover::after { width: 100%; }
 
 .menu-right { 
@@ -128,9 +170,124 @@ body {
     justify-content: flex-end;
 }
 
+.menu-right .btn,
+.menu-right .btn-outline {
+  padding: 13px 32px;
+  font-size: 14px;
+  position: relative;
+  top: -20%;
+}
+
 .btn { background: #34656D; color: #fff; border: none; padding: 16px 40px; border-radius: 35px; cursor: pointer; font-size: 18px; font-weight: 600; transition: transform 0.2s; white-space: nowrap; }
 .btn:hover { transform: scale(1.05); }
-.btn-outline { background: transparent; border: 2px solid #34656D; color: #34656D; padding: 10px 18px; border-radius: 20px; cursor: pointer; font-size: 14px; font-weight: 700;}
+.btn-outline { background: transparent; border: 3px solid #34656D; color: #34656D; padding: 16px 40px; border-radius: 35px; cursor: pointer; font-size: 18px; font-weight: 600;}
+
+/* ================= MODAL LOGIN ================= */
+.modal-login {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 10000;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-login.show {
+  display: flex;
+}
+
+.modal-login-content {
+  background: #FAF8F1;
+  padding: 50px;
+  border-radius: 20px;
+  width: 90%;
+  max-width: 550px;
+  position: relative;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.modal-login-close {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  background: none;
+  border: none;
+  font-size: 36px;
+  color: #34656D;
+  cursor: pointer;
+  line-height: 1;
+}
+
+.modal-login-title {
+  font-family: 'Swirly Canalope', cursive;
+  font-size: 42px;
+  color: #34656D;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.modal-login-subtitle {
+  font-size: 18px;
+  color: #666;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.modal-login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.modal-login-input {
+  padding: 18px 20px;
+  border: 2px solid #34656D;
+  border-radius: 35px;
+  font-size: 18px;
+  background: #FAF8F1;
+}
+
+.modal-login-input:focus {
+  outline: none;
+  border-color: #2D5F5D;
+}
+
+.modal-login-button {
+  background: #34656D;
+  color: white;
+  border: none;
+  padding: 18px;
+  border-radius: 25px;
+  font-size: 20px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.modal-login-button:hover {
+  transform: scale(1.02);
+}
+
+.modal-login-footer {
+  text-align: center;
+  margin-top: 25px;
+  font-size: 16px;
+  color: #666;
+}
+
+.modal-login-footer a {
+  color: #34656D;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.modal-login-footer a:hover {
+  text-decoration: underline;
+}
 
 .menu-toggle {
   display: none;
@@ -296,13 +453,20 @@ body {
   font-size: 18px;
   font-weight: 600;
   cursor: pointer;
-  transition: transform 0.2s, background 0.3s;
+  transition: opacity 0.8s ease, transform 0.8s ease, background 0.3s;
   margin-bottom: 60px;
+  opacity: 0;
+  transform: translateX(-20px);
+}
+
+.btn-cta-orange.animate-in {
+  opacity: 1;
+  transform: translateX(0);
 }
 
 .btn-cta-orange:hover {
   background: #855c2d;
-  transform: translateY(-2px);
+  transform: translateX(0) translateY(-2px);
 }
 
 /* ================= BANNERS EXPANSÍVEIS ================= */
@@ -426,7 +590,7 @@ body {
   padding: 0px 32px 60px 32px;
   background: transparent;
   max-width: 1200px;
-  margin: -100px auto 0 auto;
+  margin: -50px auto 0 auto;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -446,6 +610,7 @@ body {
   margin-bottom: 25px;
   display: flex;
   flex-direction: column;
+  position: relative;
 }
 
 .method-title {
@@ -458,6 +623,8 @@ body {
   overflow: hidden;
   border-right: 3px solid #515151;
   animation: none;
+  position: relative;
+  z-index: 2;
 }
 
 .method-title.animate {
@@ -477,6 +644,11 @@ body {
   margin-top: -20px;
   white-space: nowrap;
   color: #34656D;
+  position: relative;
+  z-index: 1;
+  opacity: 0;
+  transform: translateY(-20px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
 }
 
 .app-content p {
@@ -496,6 +668,19 @@ body {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s;
+  opacity: 0;
+  transform: translateX(-20px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.app-section.animate-in .method-subtitle {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.app-section.animate-in .btn-app {
+  opacity: 1;
+  transform: translateX(0);
 }
 
 .btn-app:hover {
@@ -511,15 +696,30 @@ body {
   gap: 20px;
 }
 
+.app-cta-wrapper {
+  text-align: center;
+  background: transparent;
+  margin-top: -30px;
+  padding-bottom: 55px;
+}
+
 .phone-mockup {
   width: 275px;
-  height: 500px;
-  background: #000;
+  height: 550px;
+  background: #334443;
   border-radius: 40px;
   padding: 12px;
   box-shadow: 0 20px 60px rgba(0,0,0,0.3);
   position: relative;
   margin-top: 80px;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.phone-mockup.in-view {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .phone-notch {
@@ -529,7 +729,7 @@ body {
   transform: translateX(-50%);
   width: 150px;
   height: 30px;
-  background: #000;
+  background: #334443;
   border-radius: 0 0 20px 20px;
   z-index: 2;
 }
@@ -614,7 +814,7 @@ body {
   padding: 80px 20px; 
   background: transparent;
   text-align: center;
-  margin-top: -60px;
+  margin-top: 20px;
 }
 
 .pricing-container {
@@ -709,7 +909,644 @@ body {
 .btn-plan { background: #fff; color: #334443; border: none; padding: 16px 40px; border-radius: 35px; font-size: 18px; font-weight: bold; text-decoration: none; transition: background 0.3s; text-align: center; }
 .btn-plan:hover { background: #FAEAB1; color: #334443; }
 
-/* ================= LOGIN & DASHBOARD (PRESERVADO) ================= */
+/* ================= ÁREA LOGADA / DASHBOARD ================= */
+#dashboard {
+  display: none;
+  min-height: 100vh;
+  background: #FAF8F1;
+}
+
+/* Sidebar Desktop */
+.sidebar-logged {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 220px;
+  height: 100vh;
+  background: #FAF8F1;
+  padding: 30px 20px;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid #E5E5E5;
+  z-index: 1000;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1), padding 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.sidebar-logged.collapsed {
+  width: 70px;
+  padding: 30px 10px;
+}
+
+.sidebar-link span {
+  display: inline-block;
+  opacity: 1;
+  transform: translateX(0);
+  transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1) 0.1s, transform 0.4s cubic-bezier(0.4, 0, 0.2, 1) 0.1s;
+}
+
+.sidebar-logged.collapsed .sidebar-link span {
+  opacity: 0;
+  transform: translateX(-20px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.sidebar-link:nth-child(1) span { transition-delay: 0.05s; }
+.sidebar-link:nth-child(2) span { transition-delay: 0.08s; }
+.sidebar-link:nth-child(3) span { transition-delay: 0.11s; }
+.sidebar-link:nth-child(4) span { transition-delay: 0.14s; }
+.sidebar-link:nth-child(5) span { transition-delay: 0.17s; }
+.sidebar-link:nth-child(6) span { transition-delay: 0.20s; }
+
+.sidebar-logged.collapsed .sidebar-link:nth-child(1) span,
+.sidebar-logged.collapsed .sidebar-link:nth-child(2) span,
+.sidebar-logged.collapsed .sidebar-link:nth-child(3) span,
+.sidebar-logged.collapsed .sidebar-link:nth-child(4) span,
+.sidebar-logged.collapsed .sidebar-link:nth-child(5) span,
+.sidebar-logged.collapsed .sidebar-link:nth-child(6) span {
+  transition-delay: 0s;
+}
+
+.sidebar-footer .sidebar-link:nth-child(1) span { transition-delay: 0.23s; }
+.sidebar-footer .sidebar-link:nth-child(2) span { transition-delay: 0.26s; }
+
+.sidebar-logged.collapsed .sidebar-logo img {
+  max-width: 50px;
+}
+
+.sidebar-toggle {
+  position: absolute;
+  right: -15px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 30px;
+  height: 30px;
+  background: #34656D;
+  border: none;
+  border-radius: 50%;
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  z-index: 1001;
+}
+
+.sidebar-toggle:hover {
+  background: #2a5158;
+}
+
+.sidebar-toggle i {
+  font-size: 14px;
+  transition: transform 0.3s ease;
+}
+
+.sidebar-logged.collapsed .sidebar-toggle i {
+  transform: rotate(180deg);
+}
+
+.sidebar-logo {
+  margin-bottom: 40px;
+  text-align: center;
+}
+
+.sidebar-logo img {
+  max-width: 144px;
+}
+
+.sidebar-nav {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 12px 15px;
+  text-decoration: none;
+  color: #34656D;
+  border-radius: 10px;
+  transition: all 0.3s;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.sidebar-link i {
+  font-size: 18px;
+  width: 20px;
+  text-align: center;
+}
+
+.sidebar-link:hover,
+.sidebar-link.active {
+  background: #34656D;
+  color: white;
+}
+
+.sidebar-footer {
+  padding-top: 20px;
+  border-top: 1px solid #E5E5E5;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sidebar-user {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 12px 15px;
+  color: #34656D;
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: 10px;
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.sidebar-user:hover {
+  background: #34656D;
+  color: white;
+}
+
+.sidebar-user i {
+  font-size: 18px;
+  width: 20px;
+  text-align: center;
+}
+
+.sidebar-settings {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 12px 15px;
+  text-decoration: none;
+  color: #34656D;
+  border-radius: 10px;
+  transition: all 0.3s;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.sidebar-settings:hover {
+  background: #34656D;
+  color: white;
+}
+
+.sidebar-settings i {
+  font-size: 18px;
+  width: 20px;
+  text-align: center;
+}
+
+/* Menu Mobile (rodapé) */
+.mobile-bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 70px;
+  background: #34656D;
+  justify-content: space-around;
+  align-items: center;
+  z-index: 1000;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.mobile-nav-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 20px;
+  text-decoration: none;
+  transition: all 0.3s;
+}
+
+.mobile-nav-item.active {
+  background: #FAEAB1;
+  color: #34656D;
+}
+
+/* Conteúdo Principal */
+.dashboard-content {
+  margin-left: 220px;
+  padding: 0;
+  min-height: 100vh;
+  transition: margin-left 0.3s ease;
+}
+
+.sidebar-logged.collapsed ~ .dashboard-content {
+  margin-left: 70px;
+}
+
+/* Banner Hero */
+.dashboard-hero {
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  min-height: 420px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 60px 80px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-logo-mobile {
+  display: none;
+}
+
+.dashboard-hero-text {
+  max-width: 600px;
+  color: white;
+  z-index: 2;
+  position: relative;
+  margin-left: 120px;
+}
+
+.dashboard-hero-text h1 {
+  font-size: 38px;
+  line-height: 1.3;
+  margin-bottom: 20px;
+  font-weight: 400;
+}
+
+.dashboard-hero-text h1 strong {
+  color: #FAEAB1;
+  font-weight: 700;
+}
+
+.dashboard-hero-text p {
+  font-size: 16px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.9);
+  max-width: 500px;
+}
+
+.dashboard-hero-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.hero-nutritionist {
+  width: 100%;
+  height: 170%;
+  object-fit: cover;
+  object-position: center bottom;
+  transform: translateY(0);
+}
+
+/* Plano Essencial */
+.plan-section {
+  padding: 80px 80px;
+  background: #FAF8F1;
+}
+
+.plan-title {
+  font-size: 48px;
+  text-align: center;
+  margin-bottom: 50px;
+  color: #34656D;
+  font-family: 'Georgia', serif;
+}
+
+.plan-highlight {
+  font-family: 'Georgia', serif;
+  font-style: italic;
+  color: #34656D;
+}
+
+.modules-carousel {
+  position: relative;
+  margin-bottom: 40px;
+}
+
+.modules-container {
+  display: flex;
+  gap: 30px;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  padding: 20px 0;
+  scrollbar-width: none;
+}
+
+.modules-container::-webkit-scrollbar {
+  display: none;
+}
+
+.module-card {
+  flex: 0 0 336px;
+  background: transparent;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+  cursor: pointer;
+}
+
+.module-card:hover {
+  transform: scale(1.05);
+}
+
+.module-image {
+  width: 100%;
+  height: 380px;
+  background: #E5E5E5;
+  position: relative;
+}
+
+.module-image::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 220px;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0) 100%);
+  pointer-events: none;
+}
+
+.module-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.module-tag {
+  position: absolute;
+  bottom: 60px;
+  left: 15px;
+  background: #FAEAB1;
+  padding: 8px 20px;
+  border-radius: 0;
+  font-family: 'Georgia', serif;
+  font-style: italic;
+  font-size: 16px;
+  font-weight: bold;
+  color: #34656D;
+  z-index: 2;
+}
+
+.module-tag.spaced {
+  bottom: 80px;
+}
+
+.module-title {
+  position: absolute;
+  bottom: 15px;
+  left: 15px;
+  right: 15px;
+  padding: 0;
+  font-size: 23px;
+  font-style: italic;
+  color: white;
+  line-height: 1.3;
+  z-index: 2;
+  margin: 0;
+  max-width: 75%;
+}
+
+.module-title.multiline {
+  bottom: 10px;
+}
+
+.carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: #34656D;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  transition: all 0.3s;
+}
+
+.carousel-btn:hover {
+  background: #2D5F5D;
+}
+
+.carousel-btn.prev {
+  left: -25px;
+}
+
+.carousel-btn.next {
+  right: -25px;
+}
+
+.upgrade-btn {
+  display: block;
+  margin: 0 auto;
+  padding: 15px 50px;
+  background: transparent;
+  color: #34656D;
+  border: 2px solid #34656D;
+  border-radius: 30px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.upgrade-btn:hover {
+  background: #34656D;
+  color: white;
+}
+
+/* Ferramentas */
+.tools-section {
+  padding: 80px 80px 100px;
+  background: #FAF8F1;
+}
+
+.tools-title {
+  font-size: 48px;
+  text-align: center;
+  margin-bottom: 50px;
+  color: #34656D;
+  font-family: 'Georgia', serif;
+}
+
+.tools-highlight {
+  font-family: 'Georgia', serif;
+  font-style: italic;
+  color: #34656D;
+}
+
+.tools-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 30px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.tool-card {
+  background: #34656D;
+  padding: 50px 30px;
+  border-radius: 20px;
+  text-align: center;
+  text-decoration: none;
+  color: white;
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.tool-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.tool-icon {
+  font-size: 60px;
+  margin-bottom: 20px;
+}
+
+.tool-card h3 {
+  font-size: 20px;
+  font-weight: 400;
+  font-style: italic;
+}
+
+/* Responsive Mobile */
+@media (max-width: 768px) {
+  .sidebar-logged {
+    display: none;
+  }
+
+  .mobile-bottom-nav {
+    display: flex;
+  }
+
+  .dashboard-content {
+    margin-left: 0;
+    padding-bottom: 80px;
+  }
+
+  .dashboard-hero {
+    flex-direction: column;
+    padding: 40px 20px;
+    min-height: auto;
+    text-align: left;
+  }
+
+  .hero-logo-mobile {
+    display: block;
+    max-width: 80px;
+    margin: 0 0 20px 0;
+  }
+
+  .dashboard-hero-text {
+    max-width: 100%;
+    margin-left: 0;
+    z-index: 2;
+    position: relative;
+  }
+
+  .dashboard-hero-text h1 {
+    font-size: 24px;
+    margin-bottom: 15px;
+  }
+
+  .dashboard-hero-text p {
+    font-size: 14px;
+    max-width: 100%;
+    line-height: 1.5;
+  }
+
+  .dashboard-hero-image {
+    position: relative;
+    height: 250px;
+    width: 100%;
+    margin-top: 30px;
+    order: -1;
+  }
+
+  .hero-nutritionist {
+    position: relative;
+    height: 100%;
+    width: 100%;
+    object-fit: cover;
+    object-position: center;
+    transform: none;
+  }
+
+  .plan-section {
+    padding: 40px 20px;
+  }
+
+  .plan-title {
+    font-size: 28px;
+    margin-bottom: 25px;
+  }
+
+  .modules-container {
+    gap: 15px;
+    padding: 0 5px;
+  }
+
+  .module-card {
+    flex: 0 0 280px;
+  }
+
+  .module-image {
+    height: 320px;
+  }
+
+  .module-tag {
+    font-size: 14px;
+    padding: 6px 16px;
+  }
+
+  .module-title {
+    font-size: 20px;
+    max-width: 90%;
+  }
+
+  .carousel-btn {
+    display: none;
+  }
+
+  .tools-section {
+    padding: 40px 20px 100px;
+  }
+
+  .tools-title {
+    font-size: 28px;
+  }
+
+  .tools-grid {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  .tool-card {
+    padding: 30px 20px;
+  }
+}
+
+/* ================= LOGIN & DASHBOARD (ANTIGO - PRESERVADO) ================= */
 #login-screen { display: grid; height: 100vh; width: 100%; background: transparent; grid-template-columns: 1fr 1fr; }
 #dashboard { display: none; height: 100vh; width: 100vw; background: transparent; display: flex; flex-direction: column; }
 .sidebar { display: none; position: fixed; bottom: 0; left: 0; right: 0; }
@@ -750,7 +1587,7 @@ body {
 .nav-item span { display: none; font-size: 12px; }
 .sidebar.expanded .nav-item span { display: none; }
 .nav-item.active, .nav-item:hover { color: #fff; background: rgba(255,255,255,0.1); }
-.sidebar-footer { display: flex; flex-direction: row; gap: 40px; padding-top: 0; border-top: none; justify-content: center; align-items: center; }
+.sidebar-footer { display: flex; flex-direction: column; gap: 10px; padding-top: 20px; border-top: 1px solid #E5E5E5; }
 .user-profile { display: none; align-items: center; gap: 10px; padding: 5px; }
 .user-avatar { display: none; width: 30px; height: 30px; background: #fff; color: #000; border-radius: 50%; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
 .user-info { display: none; }
@@ -776,6 +1613,7 @@ body {
   margin-left: 350px;
   max-width: 800px;
   z-index: 2;
+  transform: translateY(-10%);
 }
 .hero-dash-badge {
   background: #faeab1;
@@ -912,9 +1750,9 @@ body {
   justify-content: center;
 }
 .hero-dash-image {
-  width: 100%;
-  height: 100%;
-  margin-left: -450px;
+  width: 90%;
+  height: 90%;
+  margin-left: -550px;
   object-fit: contain;
   object-position: center;
   z-index: 2;
@@ -1626,6 +2464,7 @@ body {
   .banners-cta-section h2 { font-size: 36px; margin-top: -50px;}
   .banners-cta-section { padding-left: 0; padding-right: 0; padding-top: 50px; text-align: center; }
   .banners-cta-section h2, .btn-cta-orange { padding: 8px 18px; }
+  .btn-cta-orange, .btn-app, .btn-app-cta { padding: 8px 18px; font-size: 18px; }
 
   .banner-grid-container {
     display: flex;
@@ -1664,6 +2503,8 @@ body {
 
   .app-content h2 {
     font-size: 36px;
+    justify-content: center;
+    align-items: center;
   }
 
   .method-subtitle {
@@ -1675,20 +2516,23 @@ body {
     line-height: 1.8;
   }
 
+  .app-phone-area {
+    gap: 10px;
+  }
+
   .phone-mockup {
     width: 250px;
     height: 500px;
+    margin-top: 20px;
   }
 
-  .menu {
-    max-width: 90%; /* Define que o menu ocupará apenas 90% da largura da tela */
-    margin: 0 auto; /* Mantém ele centralizado */
-    padding: 8px 15px; }
-  .logo-container img { max-height: 40px; }
+  .menu-bar { padding: 8px 20px; }
+  .menu { padding: 8px 12px; }
+  .logo-container { transform: translateX(5%) translateY(20%); animation: none; }
+  .logo-container img { max-height: 56px; }
   .menu-center { display: none; }
-  .menu-right .btn-outline { display: none; }
-  .menu-right .btn { padding: 8px 12px; font-size: 11px; }
-  .menu-toggle { display: block; }
+  .menu-right .btn-outline { padding: 8px 12px; font-size: 13px; border-radius: 35px; font-weight: 600; border-width: 2px; transform: translateY(30%); }
+  .menu-right .btn { display: none; }
   #login-screen { grid-template-columns: 1fr; }
   .login-right { display: none; }
   .pricing-container { flex-direction: column; align-items: center; }
@@ -1708,7 +2552,7 @@ body {
   }
   
   .top-hero-dash {
-    padding: 40px 20px;
+    padding: 30px 25px;
     display: grid;
     grid-template-columns: 1fr;
     grid-template-rows: auto auto auto auto;
@@ -1753,6 +2597,7 @@ body {
     height: 320px;
     margin: -20px;
     margin-left: 150px;
+    transform: translateY(5%);
   }
   
   .hero-dash-image {
@@ -1878,9 +2723,13 @@ body {
     margin: 0 auto;
     display: none;
   }
+
+  .about-title {
+    font-size: 34px;
+  }
   
   .about-name {
-    max-width: 300px;
+    max-width: 240px;
   }
   
   .about-text {
@@ -1917,20 +2766,20 @@ body {
     font-size: 12px;
   }
 }
+
+@media(min-width: 769px) {
+  .about-content {
+    transform: translateX(10%);
+  }
+
+  .menu-right {
+    transform: translateX(80%);
+  }
+}
 </style>
 </head>
 
 <body>
-
-<div class="overlay-bg" id="overlayBg" onclick="toggleMobileMenu()"></div>
-
-<nav class="mobile-nav" id="mobileNav">
-    <div class="close-menu" onclick="toggleMobileMenu()"><i class="fas fa-times"></i></div>
-    <a href="#" onclick="toggleMobileMenu()">Sobre mim</a>
-    <a href="#" onclick="toggleMobileMenu()">NutriMeth</a>
-    <a href="#" onclick="toggleMobileMenu()">Guia de Industrializados</a>
-    <button class="btn-outline btn-mobile-login" onclick="toggleMobileMenu()">Entrar</button>
-</nav>
 
 <div id="main-content">
     <div class="top-bar">
@@ -1943,23 +2792,32 @@ body {
     </div>
 
     <div class="menu-wrapper" id="menu">
-      <div class="menu">
-        <div class="menu-left">
-          <div class="logo-container">
-            <img src="./logo.png" alt="Logo">
+      <div class="menu-bar">
+        <div class="logo-container">
+          <img src="./logo.png" alt="Logo">
+        </div>
+        <div class="menu">
+          <div class="menu-right">
+            <button class="btn-outline" onclick="mostrarLogin()">Entrar</button>
+            <button class="btn">Quero fazer parte</button>
           </div>
         </div>
-        <div class="menu-center">
-          <a href="#">Sobre mim</a>
-          <a href="#">NutriMeth</a>
-          <a href="#">Guia de Industrializados</a>
-        </div>
-        <div class="menu-right">
-          <button class="btn-outline">Entrar</button>
-          <button class="btn">Quero fazer parte</button>
-          <button class="menu-toggle" onclick="toggleMobileMenu()">
-            <i class="fas fa-bars"></i>
-          </button>
+      </div>
+    </div>
+
+    <!-- Modal de Login -->
+    <div class="modal-login" id="modalLogin">
+      <div class="modal-login-content">
+        <button class="modal-login-close" onclick="fecharLogin()">&times;</button>
+        <h2 class="modal-login-title">Bem-vindo(a) de volta</h2>
+        <p class="modal-login-subtitle">Entre com suas credenciais</p>
+        <form class="modal-login-form" onsubmit="fazerLogin(event)">
+          <input type="email" id="loginEmail" class="modal-login-input" placeholder="E-mail" required>
+          <input type="password" id="loginPassword" class="modal-login-input" placeholder="Senha" required>
+          <button type="submit" class="modal-login-button">Entrar</button>
+        </form>
+        <div class="modal-login-footer">
+          Não tem uma conta? <a href="#">Cadastre-se</a>
         </div>
       </div>
     </div>
@@ -2113,7 +2971,7 @@ body {
         <div class="phone-mockup">
           <div class="phone-notch"></div>
           <div class="phone-screen" id="phoneScreen">
-            <img src="./img/app-screen-1.png" alt="App Screen" id="phoneImage">
+            <img src="/CALORIAS.png" alt="App Screen" id="phoneImage">
           </div>
         </div>
         <div class="phone-info">
@@ -2127,8 +2985,8 @@ body {
       </div>
     </section>
 
-    <div style="text-align: center; padding-bottom: 60px; background: transparent;">
-        <button class="btn">Quero fazer parte agora</button>
+    <div class="app-cta-wrapper">
+      <button class="btn btn-app-cta">Quero fazer parte agora</button>
     </div>
     
     <section class="testimonials-section">
@@ -2361,22 +3219,22 @@ body {
         <div class="about-content">
           <h2 class="about-title"><span class="about-highlight">Sobre</span></h2>
           <img src="./name.png" alt="Évellin Pandolfo" class="about-name">
-          <p class="about-crn">CRN-RS 00000000</p>
+          <p class="about-crn">CRN2 - 17150D</p>
           <p class="about-text">
-            Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat.
+          <b>Nutricionista</b>, formada pela <b>Universidade Ritter dos Reis</b>, com mais de <b>5 anos de experiência</b> ajudando pessoas a transformarem seus corpos, sua saúde e sua relação com a alimentação. Atuo nas áreas de <b>emagrecimento, hipertrofia, performance, reeducação alimentar e tratamento de patologias</b>, sempre com uma abordagem individualizada e baseada em ciência.
           </p>
           <p class="about-text">
-            Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi.
+            Ao longo da minha trajetória, realizei diversos <b>cursos de especialização</b> na área da nutrição e desenvolvi um método próprio, pensado para quem busca resultados <b>reais e sustentáveis</b>, sem soluções milagrosas.
           </p>
           <p class="about-text">
-            Lorem ipsum dolor sit amet, cons ectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.
+            Meu propósito é te ajudar a construir hábitos que façam sentido para sua rotina e tragam resultados que permanecem a longo prazo.
           </p>
         </div>
       </div>
     </section>
 </div>
 
-<footer class="footer">
+<footer class="footer" id="footer-landing">
   <div class="footer-container">
     <div class="footer-logo">
       <img src="./logoreduzido.png" alt="Logo Nutricionista">
@@ -2599,6 +3457,110 @@ if (bannerContainer) {
   bannerObserver.observe(bannerContainer);
 }
 
+// Intersection Observer para animação do botão "Cadastre-se agora"
+const ctaButton = document.querySelector('.btn-cta-orange');
+if (ctaButton) {
+  const ctaObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        ctaButton.classList.add('animate-in');
+        ctaObserver.unobserve(ctaButton);
+      }
+    });
+  }, { threshold: 0.3 });
+
+  ctaObserver.observe(ctaButton);
+}
+
+// Intersection Observer para animação da seção do app
+const appSection = document.querySelector('.app-section');
+if (appSection) {
+  const appSectionObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        appSection.classList.add('animate-in');
+        appSectionObserver.unobserve(appSection);
+      }
+    });
+  }, { threshold: 0.3 });
+
+  appSectionObserver.observe(appSection);
+}
+
+// Funções do Modal de Login
+function mostrarLogin() {
+  document.getElementById('modalLogin').classList.add('show');
+  document.body.style.overflow = 'hidden';
+}
+
+function fecharLogin() {
+  document.getElementById('modalLogin').classList.remove('show');
+  document.body.style.overflow = '';
+}
+
+function fazerLogin(event) {
+  event.preventDefault();
+  
+  const email = document.getElementById('loginEmail').value;
+  const password = document.getElementById('loginPassword').value;
+  
+  // Validar e-mail
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    alert('Por favor, insira um e-mail válido');
+    return;
+  }
+  
+  // Qualquer senha é aceita, basta ter preenchido
+  if (password.length > 0) {
+    // Fechar modal primeiro
+    fecharLogin();
+    
+    // Esconder todo o conteúdo principal da landing page
+    const mainContent = document.getElementById('main-content');
+    if (mainContent) {
+      mainContent.style.display = 'none';
+    }
+    
+    // Esconder footer da landing page
+    const footer = document.getElementById('footer-landing');
+    if (footer) {
+      footer.style.display = 'none';
+    }
+    
+    // Mostrar área logada (dashboard)
+    const dashboard = document.getElementById('dashboard');
+    if (dashboard) {
+      dashboard.style.display = 'flex';
+    }
+    
+    // Scroll para o topo
+    window.scrollTo(0, 0);
+  }
+}
+
+// Fechar modal ao clicar fora
+document.getElementById('modalLogin')?.addEventListener('click', function(e) {
+  if (e.target === this) {
+    fecharLogin();
+  }
+});
+
+// Intersection Observer para animação do phone-mockup
+const phoneMockup = document.querySelector('.phone-mockup');
+if (phoneMockup) {
+  const phoneObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        phoneMockup.classList.add('in-view');
+        phoneObserver.unobserve(phoneMockup);
+      }
+    });
+  }, { threshold: 0.3 });
+
+  phoneObserver.observe(phoneMockup);
+}
+
 // Carrossel de telas do app
 const appScreens = [
   {
@@ -2617,7 +3579,7 @@ const appScreens = [
     description: 'Acesse centenas de receitas saudáveis e práticas.'
   },
   {
-    image: '/img/app-screen-4.png',
+    image: 'CALORIAS.png',
     title: 'Calculadora',
     description: 'Calcule suas calorias e macronutrientes facilmente.'
   }
@@ -2677,6 +3639,200 @@ function changePhoneScreen(direction) {
       }, 400);
     }, 50);
   }, 400);
+}
+</script>
+
+<!-- Dashboard / Área Logada -->
+<div id="dashboard" style="display: none;">
+  <!-- Sidebar Desktop -->
+  <div class="sidebar-logged">
+    <button class="sidebar-toggle" onclick="toggleSidebar()">
+      <i class="fas fa-chevron-left"></i>
+    </button>
+    <div class="sidebar-logo">
+      <img src="./logo.png" alt="Évellin Pandolfo">
+    </div>
+    <nav class="sidebar-nav">
+      <a href="#" class="sidebar-link active">
+        <i class="fas fa-home"></i>
+        <span>Home</span>
+      </a>
+      <a href="#" class="sidebar-link">
+        <i class="fas fa-calendar-alt"></i>
+        <span>Agendamentos</span>
+      </a>
+      <a href="Calculadora de Calorias.html" class="sidebar-link">
+        <i class="fas fa-calculator"></i>
+        <span>Calculadora de Calorias</span>
+      </a>
+      <a href="#" class="sidebar-link">
+        <i class="fas fa-clipboard-check"></i>
+        <span>Avaliação Física</span>
+      </a>
+      <a href="#" class="sidebar-link">
+        <i class="fas fa-headset"></i>
+        <span>Suporte</span>
+      </a>
+      <a href="#" class="sidebar-link">
+        <i class="fas fa-chart-line"></i>
+        <span>Minha evolução</span>
+      </a>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="#" class="sidebar-link">
+        <i class="fas fa-user-circle"></i>
+        <span>Gabriel Dorgan</span>
+      </a>
+      <a href="#" class="sidebar-link">
+        <i class="fas fa-cog"></i>
+        <span>Configurações</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- Menu Mobile (rodapé) -->
+  <div class="mobile-bottom-nav">
+    <a href="#" class="mobile-nav-item">
+      <i class="fas fa-user"></i>
+    </a>
+    <a href="#" class="mobile-nav-item">
+      <i class="fas fa-calendar-alt"></i>
+    </a>
+    <a href="#" class="mobile-nav-item active">
+      <i class="fas fa-home"></i>
+    </a>
+    <a href="#" class="mobile-nav-item">
+      <i class="fas fa-chart-line"></i>
+    </a>
+    <a href="#" class="mobile-nav-item">
+      <i class="fas fa-cog"></i>
+    </a>
+  </div>
+
+  <!-- Conteúdo Principal -->
+  <div class="dashboard-content">
+    <!-- Banner Hero -->
+    <section class="dashboard-hero">
+      <div class="dashboard-hero-text">
+        <img src="./logo.png" alt="Évellin Pandolfo" class="hero-logo-mobile">
+        <h1>Bem-vindo(a) à sua jornada de<br>com o <strong>Trilha do NutriMeth.</strong></h1>
+        <p>Explore guias exclusivos, calcule suas calorias, realize sua avaliação física sem sair de casa e acompanhe sua evolução com ferramentas desenvolvidas especialmente para você.</p>
+      </div>
+      <div class="dashboard-hero-image">
+        <img src="./banner_principal_site.png" alt="Nutricionista" class="hero-nutritionist">
+      </div>
+    </section>
+
+    <!-- Plano Essencial -->
+    <section class="plan-section">
+      <h2 class="plan-title">Plano <span class="plan-highlight">essencial</span></h2>
+      
+      <div class="modules-carousel">
+        <button class="carousel-btn prev" onclick="scrollModules(-1)">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+        
+        <div class="modules-container">
+          <div class="module-card">
+            <div class="module-image">
+              <img src="./img/banner1.png" alt="Módulo 1">
+              <div class="module-tag">módulo 1</div>
+              <h3 class="module-title">Reeducando sua mente</h3>
+            </div>
+          </div>
+
+          <div class="module-card">
+            <div class="module-image">
+              <img src="./img/banner2.png" alt="Módulo 2">
+              <div class="module-tag spaced">módulo 2</div>
+              <h3 class="module-title multiline">Mudando sua relação com a comida</h3>
+            </div>
+          </div>
+
+          <div class="module-card">
+            <div class="module-image">
+              <img src="./img/banner3.png" alt="Módulo 3">
+              <div class="module-tag spaced">módulo 3</div>
+              <h3 class="module-title multiline">Escolhas leves, corpo em equilíbrio</h3>
+            </div>
+          </div>
+
+          <div class="module-card">
+            <div class="module-image">
+              <img src="./img/banner5.png" alt="Módulo 4">
+              <div class="module-tag spaced">módulo 4</div>
+              <h3 class="module-title">Resultados que permanecem</h3>
+            </div>
+          </div>
+
+          <div class="module-card">
+            <div class="module-image">
+              <div class="module-tag">módulo 5</div>
+              <h3 class="module-title">Título de exemplo</h3>
+            </div>
+          </div>
+
+          <div class="module-card">
+            <div class="module-image">
+              <div class="module-tag">módulo 6</div>
+              <h3 class="module-title">Título de exemplo</h3>
+            </div>
+          </div>
+
+          <div class="module-card">
+            <div class="module-image">
+              <div class="module-tag">módulo 7</div>
+              <h3 class="module-title">Título de exemplo</h3>
+            </div>
+          </div>
+        </div>
+        
+        <button class="carousel-btn next" onclick="scrollModules(1)">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      </div>
+
+      <button class="upgrade-btn">Fazer upgrade no plano</button>
+    </section>
+
+    <!-- Ferramentas -->
+    <section class="tools-section">
+      <h2 class="tools-title">Suas <span class="tools-highlight">ferramentas</span></h2>
+      
+      <div class="tools-grid">
+        <a href="Calculadora de Calorias.html" class="tool-card">
+          <div class="tool-icon">
+            <i class="fas fa-calculator"></i>
+          </div>
+          <h3>Calculadora de Calorias</h3>
+        </a>
+
+        <a href="#" class="tool-card">
+          <div class="tool-icon">
+            <i class="fas fa-heartbeat"></i>
+          </div>
+          <h3>Avaliação Física Online</h3>
+        </a>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>
+// Funções do Dashboard
+function scrollModules(direction) {
+  const container = document.querySelector('.modules-container');
+  const scrollAmount = 320;
+  if (direction === -1) {
+    container.scrollBy({ left: -scrollAmount, behavior: 'smooth' });
+  } else {
+    container.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+  }
+}
+
+function toggleSidebar() {
+  const sidebar = document.querySelector('.sidebar-logged');
+  sidebar.classList.toggle('collapsed');
 }
 </script>
 

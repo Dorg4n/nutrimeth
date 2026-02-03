@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avaliação Física Antropométrica</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Swirly+Canalope&display=swap" rel="stylesheet">
+    <style>
+        @font-face {
+            font-family: 'SwirlyCanalope_PERSONAL_USE_ONLY';
+            src: url('./SwirlyCanalope_PERSONAL_USE_ONLY.otf') format('opentype');
+            font-weight: normal;
+            font-style: normal;
+            font-display: swap;
+        }
+
+        :root {
+            --primary: #34656D;
+            --secondary: #4a5568;
+            --accent: #FAEAB1;
+            --text-muted: #6b7280;
+            --ia-color: #8e44ad;
+            --bg: #FAF8F1;
+            --border: #D1D5DB;
+        }
+
+        html, body {
+            font-family: 'Segoe UI', -apple-system, sans-serif;
+            background: var(--bg);
+            color: #4a5568;
+            line-height: 1.6;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .card {
+            background: transparent;
+            padding: 0;
+            border-radius: 0;
+            box-shadow: none;
+            max-width: none;
+            width: 100%;
+            position: relative;
+            overflow: visible;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            line-height: 1.2;
+            font-family: 'Circular Std Medium', 'Circular Std', 'Segoe UI', sans-serif;
+            font-size: 1.85rem;
+            color: #515151;
+            padding: 6px 0;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .title-highlight {
+            background: var(--accent);
+            padding: 6px 12px;
+            border-radius: 6px;
+            display: inline-block;
+        }
+
+        .title-fancy {
+            font-family: 'SwirlyCanalope_PERSONAL_USE_ONLY', 'Swirly Canalope', serif;
+            font-weight: 500;
+            color: var(--primary);
+            margin-top: -35px;
+            display: inline-block;
+            font-size: 2.8em;
+        }
+        
+        .grid { display: grid; grid-template-columns: 1fr 1fr; column-gap: 24px; row-gap: 22px; margin-bottom: 24px; }
+        .grid > div { margin-bottom: 0; }
+        label { font-size: 0.85em; font-weight: 600; color: #4a5568; margin-bottom: 9px; display: block; }
+        input, select {
+            width: 100%;
+            max-width: 364px;
+            margin-left: auto;
+            margin-right: auto;
+            padding: 16px 20px;
+            border: 2px solid var(--border);
+            border-radius: 50px;
+            box-sizing: border-box;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            background: var(--bg);
+            color: var(--text-muted);
+        }
+        input:focus, select:focus { outline: none; border-color: var(--primary); }
+
+        #genero {
+            max-width: 364px;
+            width: 315px;
+            margin-left: 0;
+            margin-right: 0;
+            display: block;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+            background-repeat: no-repeat;
+            background-position: calc(100% - 20px) 50%;
+            background-size: 14.4px;
+            padding-right: 20px;
+        }
+        
+        .photo-area { background: var(--bg); padding: 10px 0 20px; margin-bottom: 20px; }
+        .photo-title {
+            text-align: center;
+            margin-bottom: 16px;
+            line-height: 1.1;
+            font-family: 'Circular Std Medium', 'Circular Std', 'Segoe UI', sans-serif;
+            font-size: 1.85rem;
+            color: #515151;
+            font-weight: 600;
+        }
+        .photo-title .title-highlight { display: inline-block; }
+        .photo-title .title-fancy { display: block; margin-top: -30px; }
+        .photo-title-fancy { font-size: 3em; }
+        .photo-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-top: 6px; }
+        .photo-item { text-align: center; }
+        .photo-caption {
+            display: block;
+            font-family: 'SwirlyCanalope_PERSONAL_USE_ONLY', 'Swirly Canalope', serif;
+            color: var(--primary);
+            font-size: 1.84rem;
+            margin-bottom: 8px;
+        }
+        .photo-upload {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            border: 2px solid var(--primary);
+            border-radius: 22px;
+            background: var(--bg);
+            color: #9ca3af;
+            height: 140px;
+            padding: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .photo-placeholder { font-size: 0.95rem; line-height: 1.2; }
+        .photo-preview {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 20px;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        .photo-remove {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: white;
+            border: 1px solid var(--border);
+            color: #4a5568;
+            font-size: 16px;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            cursor: pointer;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+        }
+        .photo-remove:hover { transform: scale(1.05); }
+        .photo-upload.has-preview .photo-preview { opacity: 1; }
+        .photo-upload.has-preview .photo-remove { opacity: 1; }
+        .photo-upload.has-preview .photo-placeholder { opacity: 0; }
+        .photo-upload:hover {
+            background: #f0f7ff;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(52, 101, 109, 0.15);
+        }
+        .photo-upload input[type="file"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .popup-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.35);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            padding: 20px;
+        }
+
+        .popup-overlay.show { display: flex; }
+
+        .popup-card {
+            background: var(--accent);
+            border-radius: 28px;
+            padding: 40px 48px 44px;
+            min-width: 280px;
+            max-width: 520px;
+            width: 100%;
+            position: relative;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+        }
+
+        .popup-close {
+            position: absolute;
+            top: 16px;
+            right: 18px;
+            background: transparent;
+            border: none;
+            color: var(--primary);
+            font-size: 32px;
+            line-height: 1;
+            cursor: pointer;
+        }
+
+        .popup-title {
+            font-family: 'Circular Std Medium', 'Circular Std', 'Segoe UI', sans-serif;
+            font-size: 2rem;
+            color: #515151;
+            font-weight: 600;
+        }
+
+        .popup-fancy {
+            font-family: 'SwirlyCanalope_PERSONAL_USE_ONLY', 'Swirly Canalope', serif;
+            color: var(--primary);
+            font-size: 3.6rem;
+            font-weight: 500;
+            margin-top: -6px;
+        }
+
+        @media (max-width: 768px) {
+            .popup-card { padding: 30px 28px 34px; }
+            .popup-title { font-size: 1.5rem; }
+            .popup-fancy { font-size: 2.6rem; }
+        }
+        .photo-upload span {
+            font-size: 0.95rem;
+            line-height: 1.2;
+        }
+        
+        .btn-main {
+            width: 100%;
+            padding: 18px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.05em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+        .btn-main:hover { background: #2a5159; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(52, 101, 109, 0.3); }
+        
+        .btn-secondary {
+            width: 100%;
+            padding: 16px;
+            background: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 0.95em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+        }
+        .btn-secondary:hover { background: #374151; transform: translateY(-2px); }
+        
+        .btn-guide {
+            display: block;
+            text-align: center;
+            padding: 12px 16px;
+            background: var(--bg);
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            border-radius: 50px;
+            text-decoration: none;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            transition: all 0.2s ease;
+        }
+        .btn-guide:hover { background: #f0f7ff; }
+
+        #secao-circunferencias { display: none; background: var(--bg); padding: 18px; border-radius: 20px; border-left: none; margin-bottom: 20px; animation: fadeIn 0.4s ease; }
+        
+        .modo-selecao { display: flex; gap: 10px; margin-bottom: 20px; }
+        .btn-modo { flex: 1; padding: 12px 10px; border: 2px solid var(--border); border-radius: 50px; cursor: pointer; background: var(--bg); font-weight: 600; font-size: 0.8em; transition: 0.2s; }
+        .btn-modo.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .btn-modo-ia.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+
+        #area-ia-loading { display: none; text-align: center; padding: 20px; color: #fff; font-weight: bold; background: var(--primary); border-radius: 12px; }
+        
+        .info-opcional { font-size: 0.8rem; color: #7f8c8d; font-style: italic; margin-bottom: 15px; display: block; }
+        .aviso-aproximado { background: #fff3cd; color: #856404; padding: 12px; border-radius: 12px; font-size: 0.85rem; margin-bottom: 20px; border: 1px solid #ffeeba; }
+
+        #resultado { display: none; margin-top: 30px; animation: fadeIn 0.6s ease; }
+        .result-layout { display: flex; gap: 24px; align-items: flex-start; }
+        .result-figure {
+            flex: 0 0 160px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .result-figure svg { width: 140px; height: 220px; fill: #34656D; }
+        .result-details { flex: 1; min-width: 0; }
+        .result-item { margin-bottom: 20px; padding: 18px; border-radius: 20px; background: white; box-shadow: 0 6px 18px rgba(0,0,0,0.06); position: relative; }
+        
+        .result-label { font-size: 1.05rem; font-weight: 600; color: #2d3436; }
+        .result-value { font-size: 1.1rem; font-weight: 700; color: #2D5F5D; margin-left: 8px; }
+        .disclaimer { font-size: 0.9rem; color: var(--text-muted); margin-top: 4px; display: block; }
+
+        .tag { padding: 4px 10px; border-radius: 6px; font-size: 0.75em; color: white; vertical-align: middle; }
+        .bg-ok { background: #27ae60; }
+        .bg-alert { background: #e17055; }
+
+        .reveal-item {
+            opacity: 0;
+            transform: translateY(16px);
+            transition: opacity 0.8s ease, transform 0.8s ease;
+        }
+
+        .reveal-item.in-view {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        @media (max-width: 768px) {
+            body { padding: 12px; }
+            .card { padding: 0; }
+            h2 { font-size: 1.4rem; }
+            .grid { grid-template-columns: 1fr; }
+            input, select { padding: 14px 16px; font-size: 0.9rem; }
+            .btn-main, .btn-secondary { padding: 16px; font-size: 0.95rem; }
+            .photo-title .title-fancy { margin-top: -4px; }
+            .photo-grid { grid-template-columns: 1fr; }
+            .photo-upload { height: 120px; }
+            .result-layout { flex-direction: column; align-items: center; }
+            .result-figure { flex: 0 0 auto; }
+            .result-figure svg { width: 120px; height: 190px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2><span class="title-highlight">Avaliação de</span><br><span class="title-fancy">composição corporal</span></h2>
+    
+    <div class="grid">
+        <div>
+            <label>Peso Total (kg)</label>
+            <input type="number" id="peso" step="0.1" placeholder="Ex: 80.0">
+        </div>
+        <div>
+            <label>Altura (cm)</label>
+            <input type="number" id="altura" placeholder="Ex: 175">
+        </div>
+        <div>
+            <label>Manequim (Calça)</label>
+            <input type="number" id="roupa" placeholder="Ex: 40">
+        </div>
+        <div>
+            <label>Idade</label>
+            <input type="number" id="idade" placeholder="Ex: 30">
+        </div>
+    </div>
+
+    <label>Gênero Biológico</label>
+    <select id="genero" style="margin-bottom: 50px;">
+        <option value="masculino">Masculino</option>
+        <option value="feminino">Feminino</option>
+    </select>
+
+    <div class="photo-area">
+        <div class="photo-title">
+            <span class="title-highlight">Fotos para</span>
+            <span class="title-fancy photo-title-fancy">análise</span>
+        </div>
+        <div class="photo-grid">
+            <div class="photo-item">
+                <span class="photo-caption">frente</span>
+                <label class="photo-upload" for="foto1">
+                    <input type="file" id="foto1" accept="image/*">
+                    <img class="photo-preview" alt="Prévia da foto frente">
+                    <button type="button" class="photo-remove" aria-label="Remover foto">×</button>
+                    <span class="photo-placeholder">Escolha o arquivo<br>ou arraste aqui</span>
+                </label>
+            </div>
+            <div class="photo-item">
+                <span class="photo-caption">lado</span>
+                <label class="photo-upload" for="foto2">
+                    <input type="file" id="foto2" accept="image/*">
+                    <img class="photo-preview" alt="Prévia da foto lado">
+                    <button type="button" class="photo-remove" aria-label="Remover foto">×</button>
+                    <span class="photo-placeholder">Escolha o arquivo<br>ou arraste aqui</span>
+                </label>
+            </div>
+            <div class="photo-item">
+                <span class="photo-caption">costas</span>
+                <label class="photo-upload" for="foto3">
+                    <input type="file" id="foto3" accept="image/*">
+                    <img class="photo-preview" alt="Prévia da foto costas">
+                    <button type="button" class="photo-remove" aria-label="Remover foto">×</button>
+                    <span class="photo-placeholder">Escolha o arquivo<br>ou arraste aqui</span>
+                </label>
+            </div>
+        </div>
+    </div>
+
+    <div class="popup-overlay" id="popupOverlay" aria-hidden="true">
+        <div class="popup-card" role="dialog" aria-modal="true" aria-labelledby="popupTitle" aria-describedby="popupFancy">
+            <button class="popup-close" type="button" aria-label="Fechar" onclick="closePopup()">×</button>
+            <div class="popup-title" id="popupTitle">Realizado com</div>
+            <div class="popup-fancy" id="popupFancy">sucesso</div>
+        </div>
+    </div>
+
+    <button type="button" class="btn-secondary" onclick="toggleCircunferencias()">ADICIONAR CIRCUNFERÊNCIAS (OPCIONAL)</button>
+
+    <div id="secao-circunferencias">
+        <span class="info-opcional">O preenchimento das circunferências ajuda a tornar os resultados mais precisos.</span>
+        
+        <div class="modo-selecao">
+            <button class="btn-modo active" id="btn-manual" onclick="setModo('manual')">PREENCHER MANUAL</button>
+            <button class="btn-modo btn-modo-ia" id="btn-ia" onclick="setModo('ia')">GERAR PELAS FOTOS (IA)</button>
+        </div>
+
+        <div id="area-manual">
+            <a href="/Guias/Guia de Medidas.pdf" target="_blank" class="btn-guide">📖 ACESSAR GUIA DE MEDIDAS</a>
+            <div class="grid">
+                <div><label>Cintura (cm)</label><input type="number" id="cintura" class="input-circ"></div>
+                <div><label>Abdômen (cm)</label><input type="number" id="abdomen" class="input-circ"></div>
+                <div><label>Coxa (cm)</label><input type="number" id="coxa" class="input-circ"></div>
+                <div><label>Braço (cm)</label><input type="number" id="braco" class="input-circ"></div>
+                <div><label>Quadril (cm)</label><input type="number" id="quadril" class="input-circ"></div>
+                <div><label>Panturrilha (cm)</label><input type="number" id="panturrilha" class="input-circ"></div>
+            </div>
+        </div>
+
+        <div id="area-ia-loading">
+            <span>✨ Analisando silhueta e calculando medidas...</span>
+        </div>
+    </div>
+
+    <button class="btn-main" onclick="calcular()">GERAR MINHA AVALIAÇÃO</button>
+
+    <div id="resultado">
+        <div class="aviso-aproximado">
+            ⚠️ <strong>Aviso:</strong> Os resultados abaixo são valores aproximados da sua composição corporal.
+        </div>
+        <div class="result-layout">
+            <div class="result-figure" aria-hidden="true">
+                <svg viewBox="0 0 120 200" role="img" focusable="false">
+                    <circle cx="60" cy="22" r="18" />
+                    <path d="M60 44c18 0 34 14 34 32v22c0 10-6 19-15 23l-7 4v26c0 8-6 14-14 14s-14-6-14-14v-26l-7-4c-9-4-15-13-15-23V76c0-18 16-32 34-32z" />
+                    <path d="M34 86h-14c-10 0-18 8-18 18v10c0 6 4 10 10 10h22z" />
+                    <path d="M86 86h14c10 0 18 8 18 18v10c0 6-4 10-10 10H86z" />
+                    <path d="M46 150v30c0 8-6 14-14 14s-14-6-14-14v-26c0-8 5-15 12-18l16-6" />
+                    <path d="M74 150v30c0 8 6 14 14 14s14-6 14-14v-26c0-8-5-15-12-18l-16-6" />
+                </svg>
+            </div>
+            <div class="result-details">
+                <div class="result-item">
+                    <span class="result-label">Classificação do IMC:</span>
+                    <span id="r-imc-class" class="tag"></span>
+                    <span class="disclaimer">O IMC relaciona seu peso com sua altura.</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Percentual de Gordura:</span>
+                    <span id="r-fat-perc" class="result-value"></span>
+                    <span id="r-fat-class" class="tag" style="margin-left: 5px;"></span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label" style="color: #218c74;">Massa gorda:</span>
+                    <span id="r-fat-kg" class="result-value"></span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label" style="color: #27ae60;">Massa magra:</span>
+                    <span id="r-free-kg" class="result-value"></span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Massa Muscular:</span>
+                    <span id="r-mus-kg" class="result-value"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let modoCircunferencia = 'manual';
+
+function showPopup(title, fancy) {
+    const overlay = document.getElementById('popupOverlay');
+    const titleEl = document.getElementById('popupTitle');
+    const fancyEl = document.getElementById('popupFancy');
+    titleEl.textContent = title;
+    fancyEl.textContent = fancy;
+    overlay.classList.add('show');
+    overlay.setAttribute('aria-hidden', 'false');
+}
+
+function closePopup() {
+    const overlay = document.getElementById('popupOverlay');
+    overlay.classList.remove('show');
+    overlay.setAttribute('aria-hidden', 'true');
+}
+
+function toggleCircunferencias() {
+    const secao = document.getElementById('secao-circunferencias');
+    secao.style.display = (secao.style.display === 'block') ? 'none' : 'block';
+}
+
+function setModo(modo) {
+    modoCircunferencia = modo;
+    document.getElementById('btn-manual').classList.toggle('active', modo === 'manual');
+    document.getElementById('btn-ia').classList.toggle('active', modo === 'ia');
+    
+    if(modo === 'ia') {
+        const foto1 = document.getElementById('foto1').value;
+        if(!foto1) {
+            showPopup('Anexe as fotos', 'primeiro');
+            setModo('manual');
+            return;
+        }
+        document.getElementById('area-manual').style.opacity = '0.3';
+        document.getElementById('area-ia-loading').style.display = 'block';
+        
+        // Simulação de preenchimento de TODOS os campos após análise
+        setTimeout(() => {
+            document.getElementById('area-ia-loading').style.display = 'none';
+            document.getElementById('area-manual').style.opacity = '1';
+            
+            // Preenchimento de todos os campos solicitados
+            document.getElementById('cintura').value = 82; 
+            document.getElementById('abdomen').value = 88;
+            document.getElementById('coxa').value = 58;
+            document.getElementById('braco').value = 34;
+            document.getElementById('quadril').value = 102;
+            document.getElementById('panturrilha').value = 39;
+
+            showPopup('Realizado com', 'sucesso');
+        }, 2000);
+    } else {
+        document.getElementById('area-manual').style.opacity = '1';
+        document.getElementById('area-ia-loading').style.display = 'none';
+    }
+}
+
+function calcular() {
+    const peso = parseFloat(document.getElementById('peso').value);
+    const alturaCm = parseFloat(document.getElementById('altura').value);
+    const alturaM = alturaCm / 100;
+    const idade = parseInt(document.getElementById('idade').value);
+    const roupa = parseInt(document.getElementById('roupa').value);
+    const genero = document.getElementById('genero').value;
+
+    if(!peso || !alturaM || !idade || !roupa) return showPopup('Por favor, preencha', 'os campos obrigatórios');
+
+    const imc = peso / (alturaM * alturaM);
+    let gPerc = (1.20 * imc) + (0.23 * idade) - (genero === 'masculino' ? 16.2 : 5.4);
+    const baseRoupa = genero === 'masculino' ? 40 : 38;
+    gPerc += (roupa - baseRoupa) * 0.45; 
+
+    const massaGorduraKg = (gPerc / 100) * peso;
+    const massaLivreGorduraKg = peso - massaGorduraKg;
+    const massaMuscularKg = massaLivreGorduraKg * 0.72; 
+
+    let imcClass = imc < 18.5 ? "Abaixo do Peso" : imc < 25 ? "Peso Normal" : imc < 30 ? "Sobrepeso" : "Obesidade";
+    let fatClass = genero === 'masculino' ? (gPerc < 20 ? "Bom" : "Alto") : (gPerc < 28 ? "Bom" : "Alto");
+
+    document.getElementById('resultado').style.display = 'block';
+    document.getElementById('r-imc-class').innerText = imcClass;
+    document.getElementById('r-imc-class').className = "tag " + (imcClass === "Peso Normal" ? "bg-ok" : "bg-alert");
+    document.getElementById('r-fat-perc').innerText = gPerc.toFixed(1) + "%";
+    document.getElementById('r-fat-class').innerText = fatClass;
+    document.getElementById('r-fat-class').className = "tag " + (fatClass === "Bom" ? "bg-ok" : "bg-alert");
+    document.getElementById('r-fat-kg').innerText = massaGorduraKg.toFixed(1) + " kg";
+    document.getElementById('r-free-kg').innerText = massaLivreGorduraKg.toFixed(1) + " kg";
+    document.getElementById('r-mus-kg').innerText = massaMuscularKg.toFixed(1) + " kg";
+
+    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+}
+
+// Preview e remoção das fotos
+document.querySelectorAll('.photo-upload').forEach((label) => {
+    const input = label.querySelector('input[type="file"]');
+    const preview = label.querySelector('.photo-preview');
+    const removeBtn = label.querySelector('.photo-remove');
+    let currentUrl = null;
+
+    input.addEventListener('change', () => {
+        const file = input.files && input.files[0];
+        if (!file) return;
+        if (!file.type.startsWith('image/')) {
+            showPopup('Selecione', 'uma imagem');
+            input.value = '';
+            return;
+        }
+        if (currentUrl) URL.revokeObjectURL(currentUrl);
+        currentUrl = URL.createObjectURL(file);
+        preview.src = currentUrl;
+        label.classList.add('has-preview');
+    });
+
+    removeBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (currentUrl) URL.revokeObjectURL(currentUrl);
+        currentUrl = null;
+        preview.src = '';
+        input.value = '';
+        label.classList.remove('has-preview');
+    });
+});
+
+// Reveal itens ao entrar na tela
+const revealItems = Array.from(
+    document.querySelectorAll('.card > *')
+);
+
+revealItems.forEach(el => el.classList.add('reveal-item'));
+
+const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('in-view');
+            revealObserver.unobserve(entry.target);
+        }
+    });
+}, { threshold: 0.2 });
+
+revealItems.forEach(el => revealObserver.observe(el));
+</script>
+
+</body>
+</html>
